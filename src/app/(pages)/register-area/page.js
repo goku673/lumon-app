@@ -1,9 +1,11 @@
 import React from "react";
 
+import Tabs from "@/components/tabs";
+
 const RegisterArea = () => {
     return (
         <div>
-            {"aqui ira el componente o los componentes para registrar el area y las tablas"}
+            <Tabs/>
         </div>
     )
 }
