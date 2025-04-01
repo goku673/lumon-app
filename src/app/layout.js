@@ -22,9 +22,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      > 
+      >
         <TopMenu />
-        <div className="pt-[80px]">{children}</div>
+        <div className="pt-[80px] bg-[#0f2e5a]">{children}</div>
       </body>
     </html>
   );
