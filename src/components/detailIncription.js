@@ -1,6 +1,11 @@
 import DetailField from "./form/DetailField";
 import NameFields from "./form/nameFields";
+import { useState } from "react"
+import { useSelector } from "react-redux";
 const DetailInscription = () => {
+
+const { guardian } = useSelector((state) => state.guardian);
+
     return (
       <div className="min-h-screen  p-4 md:p-8">
         <div className="max-w-[1000px] mx-auto">

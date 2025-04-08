@@ -4,27 +4,28 @@ const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export const registerApi = createApi({
   reducerPath: 'authApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: NEXT_PUBLIC_BASE_URL + ''
+    baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
   }),
 
   endpoints: (builder) => ({
-    signUp: builder.mutation({
-      query: (signUp) => ({
-        url: '/signUp',
+
+    postIncriptionGuardian: builder.mutation({
+      query: (data) => ({
+        url: '/guardians',
         method: 'POST',
-        body: signUp,
+        body: data,
       }),
     }),
-    logIn: builder.mutation({
-      query: (credentials) => ({
-        method: "POST",
-        url: "/logIn",
-        body: credentials,
+    postIncriptionCompetitor: builder.mutation({
+      query: (data) => ({
+        url: '/competitors',
+        method: 'POST',
+        body: data,
       }),
     }),
-    getUser : builder.query({
+    getGrades: builder.query({
       query: () => ({
-        url: `/todos/`,
+        url: '/grades',
         method: 'GET',
       }),
     }),
@@ -32,7 +33,7 @@ export const registerApi = createApi({
 });
 
 export const {
-  useSignUpMutation, 
-  useLogInMutation,
-  useGetUserQuery,
+  usePostIncriptionGuardianMutation,
+  usePostIncriptionCompetitorMutation,
+  useGetGradesQuery,
 } = registerApi;

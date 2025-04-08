@@ -1,72 +1,91 @@
 "use client"
 import { useState } from "react";
+import { useSnackbar } from "notistack"; // Importar Notistack
 import RegisterAreaComponent from "./areaRegister";
 import Table from "./table";
 import Button from "@/common/button";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { useGetAreasQuery, useDeleteAreaMutation } from "@/app/redux/services/areaApi";
 
+const Tabs = () => {
+  const { enqueueSnackbar } = useSnackbar(); // Hook de Notistack
+  const { data: areas, isLoading: isAreasLoading, isError: isAreasError, refetch } = useGetAreasQuery();
+  const [deleteArea, { isLoading: isDeleting }] = useDeleteAreaMutation();
+  const [activeTab, setActiveTab] = useState("register");
 
-const data = [
-    { id: 1, area: "Matemáticas", nivel: "Básico", grado: "Primaria", costo: 150, descripcion: "Área de matemáticas básica" },
-    { id: 2, area: "Ciencias", nivel: "Avanzado", grado: "Secundaria", costo: 200, descripcion: "Área de ciencias naturales avanzada" },
-    { id: 3, area: "Historia", nivel: "Intermedio", grado: "Secundaria", costo: 180, descripcion: "Área de historia y sociedad" },
-    { id: 4, area: "Programación", nivel: "Avanzado", grado: "Universidad", costo: 250, descripcion: "Área de desarrollo de software" },
-    { id: 5, area: "Idiomas", nivel: "Básico", grado: "Todos", costo: 100, descripcion: "Área de aprendizaje de idiomas" },
-  ];
+  const handleDeleteArea = async (id) => {
+    try {
+      // Llamar al método deleteArea con el id del área
+      await deleteArea(id).unwrap();
+      enqueueSnackbar(`Área con id ${id} eliminada exitosamente`, { variant: "success" }); // Notificación de éxito
+
+      // Refrescar la lista de áreas
+      refetch();
+    } catch (error) {
+      enqueueSnackbar("Error al eliminar el área", { variant: "error" }); // Notificación de error
+      console.error("Error al eliminar el área:", error);
+    }
+  };
 
   const columns = [
     {
-    accessorKey: "id",
-    header: "Id Area",
-    cell: (info) => info.getValue(),
+      accessorKey: "id",
+      header: "Id Area",
+      cell: (info) => info.getValue(),
     },
     {
-    accessorKey: "area",
-    header: "Área",
-    cell: (info) => info.getValue(),
+      accessorKey: "name",
+      header: "Área",
+      cell: (info) => info.getValue(),
     },
     {
-    accessorKey: "nivel",
-    header: "Nivel/Categoria",
-    cell: (info) => info.getValue(),
+      accessorKey: "nivel",
+      header: "Nivel/Categoria",
+      cell: (info) => info.getValue(),
     },
     {
-    accessorKey: "grado",
-    header: "Grado Asociado",
-    cell: (info) => info.getValue(),
+      accessorKey: "grado",
+      header: "Grado Asociado",
+      cell: (info) => info.getValue(),
     },
     {
-    accessorKey: "costo",
-    header: "Costo (Bs)",
-    cell: (info) => info.getValue(),
+      accessorKey: "costo",
+      header: "Costo (Bs)",
+      cell: (info) => {
+        const costo = info.getValue();
+        return <span className="text-gray-700">{costo}</span>;
+      },
     },
     {
-    accessorKey: "descripcion",
-    header: "Descripción",
-    cell: (info) => {
-        const estado = info.getValue()
-        let textColor = "text-gray-700"
-        return <span className={textColor}>{estado}</span>
-    },
+      accessorKey: "description",
+      header: "Descripción",
+      cell: (info) => {
+        const estado = info.getValue();
+        return <span className="text-gray-700">{estado}</span>;
+      },
     },
     {
-    id: "actions",
-    header: "",
-    cell: (info) => (
-        <div className="flex space-x-2 justify-center">
-        <Button className="p-1 mb-1 bg-green-500 text-white rounded hover:bg-green-600">
-            <EditIcon />
-        </Button>
-        <Button className="p-1 mb-1 bg-red-500 text-white rounded hover:bg-red-600">
-            <DeleteIcon />
-        </Button>
-        </div>
-    ),
+      id: "actions",
+      header: "",
+      cell: (info) => {
+        const areaId = info.row.original.id; 
+        return (
+          <div className="flex space-x-2 justify-center">
+            <Button className="p-1 mb-1 bg-green-500 text-white rounded hover:bg-green-600">
+              <EditIcon />
+            </Button>
+            <Button
+              onClick={() => handleDeleteArea(areaId)} 
+              className="p-1 mb-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              <DeleteIcon />
+            </Button>
+          </div>
+        );
+      },
     },
-]
-const Tabs = () => {
-  const [activeTab, setActiveTab] = useState("register");
+  ];
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center pt-8">
@@ -93,18 +112,22 @@ const Tabs = () => {
           Ver lista de áreas registradas
         </button>
       </div>
-      {activeTab === "register" 
-      ? <RegisterAreaComponent /> 
-      :
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-lg font-bold text-center mb-4 text-white">Lista de Área(s) registradas</h1>
-        <Table columns={columns} data={data} />
-     </div>}
+      {activeTab === "register" ? (
+        <RegisterAreaComponent />
+      ) : (
+        <div className="container mx-auto py-8 px-4">
+          <h1 className="text-lg font-bold text-center mb-4 text-white">Lista de Área(s) registradas</h1>
+          {isAreasLoading ? (
+            <p className="text-center text-gray-500">Cargando áreas...</p>
+          ) : isAreasError ? (
+            <p className="text-center text-red-500">Error al cargar las áreas</p>
+          ) : (
+            <Table columns={columns} data={areas} />
+          )}
+        </div>
+      )}
     </div>
   );
 };
-
-
-
 
 export default Tabs;

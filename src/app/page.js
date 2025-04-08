@@ -4,14 +4,12 @@ import Footer from "../components/footer";
 import axios from "axios";
 import Button from "@/common/button";
 import { useState } from "react";
-import { useGetUserQuery } from "./redux/services/register";
+
 
 const Home = () => {
  
-  const { data: user, isError, isLoading } = useGetUserQuery();
-  console.log(user);
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error no cargo mis datos</div>;
+  
+ 
   return (
     <div className="">
       <div className="text-center text-white lg:text-left lg:ml-36 text-xl font-bold">

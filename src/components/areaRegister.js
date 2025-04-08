@@ -1,43 +1,22 @@
 "use client"
-
-import { useState } from "react"
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useState } from "react";
 import Button from "@/common/button";
 import Input from "@/common/input";
+import { useGetAreasQuery, usePostAreaMutation } from "@/app/redux/services/areaApi";
+import { useSnackbar } from "notistack";
 
 export default function RegisterArea() {
   const [niveles, setNiveles] = useState([""]);
-  const [showAreaDropdown, setShowAreaDropdown] = useState(false);
-  const [showGradoDropdown, setShowGradoDropdown] = useState(false);
-  const [areas, setAreas] = useState([
-    {
-      id: 1,
-      nombre: "Matemáticas",
-      niveles: ["Básico", "Intermedio"],
-      grado: "Primaria",
-      descripcion: "Área de matemáticas básicas",
-      costo: 150,
-    },
-    {
-      id: 2,
-      nombre: "Ciencias",
-      niveles: ["Avanzado"],
-      grado: "Secundaria",
-      descripcion: "Área de ciencias naturales",
-      costo: 200,
-    },
-  ]);
-
   const [formData, setFormData] = useState({
-    nombre: "",
+    name: "",
     grado: "",
-    descripcion: "",
+    description: "",
     costo: "",
   });
 
-  const areaOptions = ["Matemáticas", "Ciencias", "Lenguaje", "Historia", "Arte"];
-  const gradoOptions = ["Preescolar", "Primaria", "Secundaria", "Bachillerato", "Universidad"];
-
+  const { enqueueSnackbar } = useSnackbar();
+  const { data: areas, isLoading: isAreasLoading, isError: isAreasError, refetch } = useGetAreasQuery();
+  const [postArea, { isLoading: isPostAreaLoading, }] = usePostAreaMutation();
   const handleAddNivel = () => setNiveles([...niveles, ""]);
 
   const handleNivelChange = (index, value) => {
@@ -53,66 +32,72 @@ export default function RegisterArea() {
     });
   };
 
-  const handleSubmit = () => {
-    const newArea = {
-      id: areas.length + 1,
-      ...formData,
-      niveles,
-    };
+  const handleSubmit = async () => {
+    try {
+      
+      const payload = {
+        name: formData.name,
+        description: formData.description || null, 
+        date: formData.date || new Date().toISOString().split("T")[0],
+      };
+      enqueueSnackbar("Creando área, por favor espere...", { variant: "info" });
+      await postArea(payload).unwrap();
+      enqueueSnackbar("Área registrada exitosamente", { variant: "success" });
 
-    setAreas([...areas, newArea]);
-    setFormData({
-      nombre: "",
-      grado: "",
-      descripcion: "",
-      costo: "",
-    });
-    setNiveles([""]);
-  };
+      
+      refetch();
 
-  const selectArea = (area) => {
-    handleInputChange("nombre", area);
-    setShowAreaDropdown(false);
-  };
-
-  const selectGrado = (grado) => {
-    handleInputChange("grado", grado);
-    setShowGradoDropdown(false);
+     
+      setFormData({
+        name: "",
+        grado: "",
+        description: "",
+        costo: "",
+      });
+      setNiveles([""]);
+    } catch (error) {
+      enqueueSnackbar("Error al registrar el área", { variant: "error" });
+      console.error("Error al registrar el área:", error);
+    }
   };
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center pt-8">
+      
+      <div className="w-full max-w-2xl mb-6">
+        <h2 className="text-center text-white font-bold mb-4">Áreas Registradas</h2>
+        {isAreasLoading ? (
+          <p className="text-center text-gray-500">Cargando áreas...</p>
+        ) : isAreasError ? (
+          <p className="text-center text-red-500">Error al cargar las áreas</p>
+        ) : (
+          <ul className="bg-white rounded-md p-4 shadow-lg">
+            {areas.map((area, index) => (
+              <li key={index} className="text-gray-700 mb-2">
+                {area.name}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="w-full max-w-2xl">
         <div className="text-center text-white font-bold py-2">
           REGISTRO DE ÁREA DE COMPETENCIA
         </div>
         <div className="bg-white rounded-md p-6 shadow-lg">
+          
           <div className="mb-4">
-            <label className="block text-gray-700 mb-1">Área</label>
-            <div className="relative">
-              <div
-                className="border border-gray-300 rounded-md p-2 flex justify-between items-center cursor-pointer"
-                onClick={() => setShowAreaDropdown(!showAreaDropdown)}
-              >
-                <span className="text-gray-500">{formData.nombre || "Seleccione el área"}</span>
-                <ExpandMoreIcon className="h-4 w-4 text-gray-500" />
-              </div>
-
-              {showAreaDropdown && (
-                <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg">
-                  {areaOptions.map((area, index) => (
-                    <div
-                      key={index}
-                      className="p-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => selectArea(area)}
-                    >
-                      {area}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <label className="block text-gray-700 mb-1">Agregar Área</label>
+            <Input
+              type="text"
+              className="border border-gray-300 rounded-md p-2 w-full mb-2"
+              placeholder="Ingrese el nombre del área"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+            />
           </div>
+
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-gray-700 mb-1">Nivel/Categoría</label>
@@ -136,29 +121,13 @@ export default function RegisterArea() {
 
             <div>
               <label className="block text-gray-700 mb-1">Grado asociado</label>
-              <div className="relative">
-                <div
-                  className="border border-gray-300 rounded-md p-2 flex justify-between items-center cursor-pointer"
-                  onClick={() => setShowGradoDropdown(!showGradoDropdown)}
-                >
-                  <span className="text-gray-500">{formData.grado || "Seleccione el grado"}</span>
-                  <ExpandMoreIcon className="h-4 w-4 text-gray-500" />
-                </div>
-
-                {showGradoDropdown && (
-                  <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg">
-                    {gradoOptions.map((grado, index) => (
-                      <div
-                        key={index}
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => selectGrado(grado)}
-                      >
-                        {grado}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <Input
+                type="text"
+                className="border border-gray-300 rounded-md p-2 w-full mb-2"
+                placeholder="Ingrese el grado asociado"
+                value={formData.grado}
+                onChange={(e) => handleInputChange("grado", e.target.value)}
+              />
             </div>
           </div>
           <div className="mb-4">
@@ -167,8 +136,8 @@ export default function RegisterArea() {
               type="text"
               className="border border-gray-300 rounded-md p-2 w-full mb-2"
               placeholder="Ingrese descripción"
-              value={formData.descripcion}
-              onChange={(e) => handleInputChange("descripcion", e.target.value)}
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
             />
           </div>
           <div className="mb-6">
@@ -192,4 +161,3 @@ export default function RegisterArea() {
     </div>
   );
 }
-
