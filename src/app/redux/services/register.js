@@ -23,6 +23,13 @@ export const registerApi = createApi({
         body: data,
       }),
     }),
+    getCompetitors: builder.query({
+      query: () => ({
+        url: '/competitors',
+        method: 'GET',
+      }),
+    }),
+
     getGrades: builder.query({
       query: () => ({
         url: '/grades',
@@ -36,4 +43,5 @@ export const {
   usePostIncriptionGuardianMutation,
   usePostIncriptionCompetitorMutation,
   useGetGradesQuery,
+  useGetCompetitorsQuery,
 } = registerApi;

@@ -9,7 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useGetAreasQuery, useDeleteAreaMutation } from "@/app/redux/services/areaApi";
 
 const Tabs = () => {
-  const { enqueueSnackbar } = useSnackbar(); // Hook de Notistack
+  const { enqueueSnackbar } = useSnackbar();
   const { data: areas, isLoading: isAreasLoading, isError: isAreasError, refetch } = useGetAreasQuery();
   const [deleteArea, { isLoading: isDeleting }] = useDeleteAreaMutation();
   const [activeTab, setActiveTab] = useState("register");
@@ -47,14 +47,17 @@ const Tabs = () => {
     {
       accessorKey: "grado",
       header: "Grado Asociado",
-      cell: (info) => info.getValue(),
+      cell: (info) => {
+        const grado = info.getValue();
+        return <span className="text-gray-700">{"1ro de secundaria"}</span>;
+      },
     },
     {
       accessorKey: "costo",
       header: "Costo (Bs)",
       cell: (info) => {
         const costo = info.getValue();
-        return <span className="text-gray-700">{costo}</span>;
+        return <span className="text-gray-700">{150}</span>;
       },
     },
     {
