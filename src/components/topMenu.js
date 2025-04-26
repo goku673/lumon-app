@@ -48,7 +48,7 @@ const TopMenu = () => {
                 transform: isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)',
               }}
             >
-              <span className="sr-only">Abrir menú</span>
+              
               {isMenuOpen ? (
                 <CloseIcon className="block h-6 w-6" aria-hidden="true" />
               ) : (

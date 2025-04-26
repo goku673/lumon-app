@@ -3,7 +3,7 @@ import React from "react";
 const DropDownMenuMovil = ({ children, isMenuOpen, className }) => {
   return (
     <div className={`bg-white ${className}`}>
-      <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      <div className="px-2  pb-3 space-y-1 sm:px-3">
         {children}
       </div>
       <div
@@ -15,9 +15,7 @@ const DropDownMenuMovil = ({ children, isMenuOpen, className }) => {
           transitionDelay: '500ms',
         }}
       >
-        <p className="">
-          Los mockups para pantallas pequeñas aún no se han definido per peden dercime que tal esta esto
-        </p>
+  
       </div>
     </div>
   );
