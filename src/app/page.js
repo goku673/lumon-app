@@ -7,9 +7,6 @@ import { useState } from "react";
 
 
 const Home = () => {
- 
-  
- 
   return (
     <div className="">
       <div className="text-center text-white lg:text-left lg:ml-36 text-xl font-bold">

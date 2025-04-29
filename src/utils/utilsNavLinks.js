@@ -6,4 +6,6 @@
         { href: "/registered-by-batch", label: "Inscribir por Lote"},
         { href: "/view-registrant", label: "Ver Inscritos"},
         { href: "/register-area", label: "Registrar Área"},
+        { href: "/register-olympic", label: "Registrar Olympiada"},
+        
     ];

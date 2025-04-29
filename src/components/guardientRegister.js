@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import CloseIcon from "@mui/icons-material/Close"; // Ícono para la "X"
+import CloseIcon from "@mui/icons-material/Close";
 import Button from "@/common/button";
 import Input from "@/common/input";
 import Select from "@/common/select";

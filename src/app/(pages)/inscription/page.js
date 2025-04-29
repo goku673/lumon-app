@@ -12,6 +12,7 @@ import Title from "@/common/title"
 import OlympicsList from "@/components/olympicList"
 
 const Incription = () => {
+  const selectedOlympic = useSelector((state) => state.olympic.selectedOlympic);
   const [step, setStep] = useState(1)
   const [competitorData, setCompetitorData] = useState({})
   const [guardiansData, setGuardiansData] = useState([]);
@@ -23,6 +24,7 @@ const Incription = () => {
   const dispatch = useDispatch()
   const [postIncriptionGuardian] = usePostIncriptionGuardianMutation()
   const [postIncriptionCompetitor] = usePostIncriptionCompetitorMutation()
+  console.log("selelectOlympic", selectedOlympic);
 
 //   useEffect(() => {
 //     console.log("Cambios en guardian:", guardian)
@@ -38,6 +40,16 @@ const handleGuardianSubmit = async (data) => {
       setStep(2);
       return;
     }
+
+    if (!selectedOlympic) {
+        setModal({
+          isOpen: true,
+          title: "Olimpiada requerida",
+          message: "Seleccione una olimpiada antes de continuar",
+          type: "error"
+        });
+        return;
+      }
   
     // Crear nuevo tutor
     try {
@@ -70,6 +82,16 @@ const handleGuardianSubmit = async (data) => {
   
   const handleCompetitorSubmit = async (data) => {
     try {
+
+        if (!selectedOlympic) {
+            setModal({
+              isOpen: true,
+              title: "Olimpiada requerida",
+              message: "Seleccione una olimpiada antes de continuar",
+              type: "error"
+            });
+            return;
+          } 
       // Obtener IDs de guardians
       const guardianIds = guardiansData.map(g => g.id);
       const areaLevelGradeIds = data.area_level_grades.map(g => g.id);
@@ -122,11 +144,10 @@ const handleGuardianSubmit = async (data) => {
     <>
     <OlympicsList />
     <div className="min-h-screen max-w-[1400px] mx-auto lg:px-16">
-      <Title
-        title="Inscripción a las Olimpiadas"
+    <Title
+        title={`Inscripción a las Olimpiadas ${selectedOlympic?.name ? `- ${selectedOlympic.name}` : ""}`}
         className="text-2xl md:text-3xl font-bold text-center text-white mb-8"
-      />
-
+        />
       <div className="relative overflow-hidden">
         <div
           className={`transition-all duration-700 ease-in-out ${
@@ -167,4 +188,4 @@ const handleGuardianSubmit = async (data) => {
 
 }
 
-export default Incription
+export default Incription;
