@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useGetGradesQuery } from "@/app/redux/services/register";
-import { useGetAreasQuery, useGetProvincesQuery, useGetAreaLevelGradesQuery} from "@/app/redux/services/areaApi";
+import { useGetAreasQuery, useGetProvincesQuery} from "@/app/redux/services/areaApi";
+import { useGetAreaLevelsGradesQuery } from "@/app/redux/services/areaLevelsGrades";
 import { useGetDepartmentsQuery } from "@/app/redux/services/areaApi";
 import { useGetSchoolsQuery } from "@/app/redux/services/schoolApi";
 import SaveIcon from "@mui/icons-material/Save";
@@ -21,7 +22,7 @@ const CompetitorRegister = ({ onSubmit, onBack, initialData }) => {
   const { data: provinces, isError: isProvincesError, isLoading: isProvincesLoading } = useGetProvincesQuery();
   const { data: departments, isError: isDepartmentsError, isLoading: isDepartmentsLoading } = useGetDepartmentsQuery();
   const { data: schools, isError: isSchoolsError, isLoading: isSchoolsLoading } = useGetSchoolsQuery();
-  const { data: areaLevelGrades, isError: isAreaLevelGradesError, isLoading: isAreaLevelGradesLoading } = useGetAreaLevelGradesQuery();
+  const { data: areaLevelGrades, isError: isAreaLevelGradesError, isLoading: isAreaLevelGradesLoading } = useGetAreaLevelsGradesQuery();
   
   console.log(areaLevelGrades, "areaLevelGrades");
   console.log(areas, "areas");

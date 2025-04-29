@@ -1,21 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { usePostIncriptionAreaMutation } from "@/app/redux/services/areaApi"
+import { usePostIncriptionLevelsMutation } from "@/app/redux/services/levelsApi"
 import Button from "@/common/button"
 import Modal from "./modal/modal"
 import FormContainer from "@/common/formContainer"
 import FormContent from "@/common/formContent"
 import FormGroup from "./formGroup"
 import Input from "@/common/input"
-import CategoryIcon from "@mui/icons-material/Category"
-import DescriptionIcon from "@mui/icons-material/Description"
 import SaveIcon from "@mui/icons-material/Save"
 
-
 //refactor component
-const RegisterArea = () => {
-  const [createArea] = usePostIncriptionAreaMutation()
+const RegisterLevel = () => {
+  const [createLevel] = usePostIncriptionLevelsMutation()
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -23,7 +20,6 @@ const RegisterArea = () => {
   const [modalType, setModalType] = useState("success")
   const [wordCount, setWordCount] = useState(0)
   const [isDescriptionValid, setIsDescriptionValid] = useState(true)
-
 
   useEffect(() => {
     const words = description.trim() ? description.trim().split(/\s+/) : []
@@ -45,7 +41,7 @@ const RegisterArea = () => {
 
     if (!name.trim()) {
       setModalType("error")
-      setModalMessage("El nombre del área es requerido")
+      setModalMessage("El nombre del nivel es requerido")
       setIsModalOpen(true)
       return
     }
@@ -58,35 +54,28 @@ const RegisterArea = () => {
     }
 
     try {
-      await createArea({ name, description }).unwrap()
+      await createLevel({ name, description }).unwrap()
       setModalType("success")
-      setModalMessage("Área creada exitosamente!")
+      setModalMessage("Nivel creado exitosamente!")
       setIsModalOpen(true)
       setName("")
       setDescription("")
       setWordCount(0)
     } catch (error) {
-      console.error("Error creating area:", error)
+      console.error("Error creating level:", error)
       setModalType("error")
-      setModalMessage(error.data?.message || "Error al crear el área")
+      setModalMessage(error.data?.message || "Error al crear el nivel")
       setIsModalOpen(true)
     }
   }
 
   return (
     <FormContainer className="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-8 border border-gray-100">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4 flex items-center">
-       
-        Crear Nueva Área
-      </h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">Crear Nuevo Nivel</h2>
 
       <FormContent onSubmit={handleSubmit} className="space-y-6">
         <FormGroup
-          label={
-            <div className="flex items-center">
-              <span>Nombre del Área</span>
-            </div>
-          }
+          label="Nombre del Nivel"
           error={modalType === "error" && !name.trim() ? modalMessage : ""}
           className="mb-6"
         >
@@ -94,7 +83,7 @@ const RegisterArea = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ingresa el nombre del área"
+            placeholder="Nombre del nivel"
             required
             className="w-full px-4 py-3 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
@@ -103,10 +92,7 @@ const RegisterArea = () => {
         <FormGroup
           label={
             <div className="flex justify-between w-full">
-              <div className="flex items-center">
-                <DescriptionIcon className="mr-2" fontSize="small" />
-                <span>Descripción</span>
-              </div>
+              <span>Descripción</span>
               <span className={`text-sm ${wordCount > 10 ? "text-red-500 font-medium" : "text-gray-500"}`}>
                 {wordCount}/10 palabras
               </span>
@@ -118,20 +104,20 @@ const RegisterArea = () => {
           <textarea
             value={description}
             onChange={handleDescriptionChange}
-            className="w-full px-4 py-3  border-2 rounded-md focus:ring-2 focus:ring-red-600  transition-all resize-none"
+            className="w-full px-4 py-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
             rows={3}
-            placeholder="Descripción breve del área (máx. 10 palabras)"
+            placeholder="Descripción breve del nivel (máx. 10 palabras)"
           />
         </FormGroup>
 
         <div className="flex justify-end pt-4 border-t">
           <Button
             type="submit"
-            className="bg-[#0f2e5a] hover:bg-white border-[#0f2e5a] border-2 hover:text-[#0f2e5a] text-white px-6 py-3 rounded-md font-medium transition-colors duration-200 shadow-sm hover:shadow-md flex items-center"
+            className="bg-[#0f2e5a] hover:bg-white border-[#0f2e5a] border-2 hover:text-[#0f2e5a] text-white px-6 py-3 rounded-md font-medium transition-colors duration-200 shadow-sm hover:shadow-md"
             disabled={!isDescriptionValid || !name.trim()}
-          >
-            <SaveIcon className="mr-2" />
-            Crear Área
+          > 
+            <SaveIcon className="mr-2" fontSize="small" /> 
+            Crear Nivel
           </Button>
         </div>
       </FormContent>
@@ -150,4 +136,4 @@ const RegisterArea = () => {
   )
 }
 
-export default RegisterArea
+export default RegisterLevel
