@@ -27,7 +27,7 @@ export const areaApi = createApi({
         method: 'GET',
       }),
     }),
-    postArea : builder.mutation({
+    postIncriptionArea : builder.mutation({
       query: (data) => ({
         url: '/areas',
         method: 'POST',
@@ -40,12 +40,7 @@ export const areaApi = createApi({
         method: 'DELETE',
       }),
     }),
-    getAreaLevelGrades: builder.query({
-      query: () => ({
-        url: '/areas_levels_grades',
-        method: 'GET',
-      }),
-    }),
+    
   })
 });
 
@@ -53,7 +48,6 @@ export const {
   useGetAreasQuery,
   useGetProvincesQuery,
   useGetDepartmentsQuery,
-  usePostAreaMutation,
+  usePostIncriptionAreaMutation,
   useDeleteAreaMutation,
-  useGetAreaLevelGradesQuery,
 } = areaApi;

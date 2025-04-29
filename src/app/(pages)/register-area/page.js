@@ -1,11 +1,10 @@
 import React from "react";
-
-import Tabs from "@/components/tabs";
+import TabsRegister from "@/components/tabsRegister";
 
 const RegisterArea = () => {
     return (
         <div>
-            <Tabs/>
+            <TabsRegister />
         </div>
     )
 }

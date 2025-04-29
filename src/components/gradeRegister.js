@@ -1,29 +1,29 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { usePostIncriptionAreaMutation } from "@/app/redux/services/areaApi"
+import { usePostIncriptionGradesMutation } from "@/app/redux/services/gradesApi"
 import Button from "@/common/button"
 import Modal from "./modal/modal"
 import FormContainer from "@/common/formContainer"
 import FormContent from "@/common/formContent"
 import FormGroup from "./formGroup"
 import Input from "@/common/input"
-import CategoryIcon from "@mui/icons-material/Category"
 import DescriptionIcon from "@mui/icons-material/Description"
+import PaidIcon from "@mui/icons-material/Paid"
 import SaveIcon from "@mui/icons-material/Save"
 
 
 //refactor component
-const RegisterArea = () => {
-  const [createArea] = usePostIncriptionAreaMutation()
+const RegisterGrade = () => {
+  const [createGrade] = usePostIncriptionGradesMutation()
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
+  const [price, setPrice] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMessage, setModalMessage] = useState("")
   const [modalType, setModalType] = useState("success")
   const [wordCount, setWordCount] = useState(0)
   const [isDescriptionValid, setIsDescriptionValid] = useState(true)
-
 
   useEffect(() => {
     const words = description.trim() ? description.trim().split(/\s+/) : []
@@ -43,9 +43,9 @@ const RegisterArea = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!name.trim()) {
+    if (!name.trim() || !price) {
       setModalType("error")
-      setModalMessage("El nombre del área es requerido")
+      setModalMessage("Todos los campos requeridos deben ser llenados")
       setIsModalOpen(true)
       return
     }
@@ -58,17 +58,18 @@ const RegisterArea = () => {
     }
 
     try {
-      await createArea({ name, description }).unwrap()
+      await createGrade({ name, description, price: Number.parseFloat(price) }).unwrap()
       setModalType("success")
-      setModalMessage("Área creada exitosamente!")
+      setModalMessage("Grado creado exitosamente!")
       setIsModalOpen(true)
       setName("")
       setDescription("")
+      setPrice("")
       setWordCount(0)
     } catch (error) {
-      console.error("Error creating area:", error)
+      console.error("Error creating grade:", error)
       setModalType("error")
-      setModalMessage(error.data?.message || "Error al crear el área")
+      setModalMessage(error.data?.message || "Error al crear el grado")
       setIsModalOpen(true)
     }
   }
@@ -76,15 +77,14 @@ const RegisterArea = () => {
   return (
     <FormContainer className="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-8 border border-gray-100">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4 flex items-center">
-       
-        Crear Nueva Área
+        Crear Nuevo Grado
       </h2>
 
       <FormContent onSubmit={handleSubmit} className="space-y-6">
         <FormGroup
           label={
             <div className="flex items-center">
-              <span>Nombre del Área</span>
+              <span>Nombre del Grado</span>
             </div>
           }
           error={modalType === "error" && !name.trim() ? modalMessage : ""}
@@ -94,7 +94,7 @@ const RegisterArea = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ingresa el nombre del área"
+            placeholder="Nombre del grado"
             required
             className="w-full px-4 py-3 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
@@ -118,9 +118,30 @@ const RegisterArea = () => {
           <textarea
             value={description}
             onChange={handleDescriptionChange}
-            className="w-full px-4 py-3  border-2 rounded-md focus:ring-2 focus:ring-red-600  transition-all resize-none"
+            className="w-full px-4 py-3 border rounded-md focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all resize-none"
             rows={3}
-            placeholder="Descripción breve del área (máx. 10 palabras)"
+            placeholder="Descripción breve del grado (máx. 10 palabras)"
+          />
+        </FormGroup>
+
+        <FormGroup
+          label={
+            <div className="flex items-center">
+              <PaidIcon className="mr-2" fontSize="small" />
+              <span>Precio (Bs)</span>
+            </div>
+          }
+          error={modalType === "error" && !price ? modalMessage : ""}
+          className="mb-6"
+        >
+          <Input
+            type="number"
+            step="0.01"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            placeholder="Costo del grado"
+            required
+            className="w-full px-4 py-3 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
         </FormGroup>
 
@@ -128,10 +149,10 @@ const RegisterArea = () => {
           <Button
             type="submit"
             className="bg-[#0f2e5a] hover:bg-white border-[#0f2e5a] border-2 hover:text-[#0f2e5a] text-white px-6 py-3 rounded-md font-medium transition-colors duration-200 shadow-sm hover:shadow-md flex items-center"
-            disabled={!isDescriptionValid || !name.trim()}
+            disabled={!isDescriptionValid || !name.trim() || !price}
           >
             <SaveIcon className="mr-2" />
-            Crear Área
+            Crear Grado
           </Button>
         </div>
       </FormContent>
@@ -150,4 +171,4 @@ const RegisterArea = () => {
   )
 }
 
-export default RegisterArea
+export default RegisterGrade
