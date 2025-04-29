@@ -21,14 +21,12 @@ const Modal = ({
 }) => {
   if (!isOpen) return null
 
-  // Función para manejar el clic del botón primario
   const handlePrimaryClick = () => {
     if (onPrimaryClick) {
       onPrimaryClick()
     }
   }
 
-  // Función para manejar el clic del botón secundario
   const handleSecondaryClick = () => {
     if (onSecondaryClick) {
       onSecondaryClick()
@@ -47,7 +45,7 @@ const Modal = ({
           onPrimaryClick={handlePrimaryClick}
           onSecondaryClick={handleSecondaryClick}
           className={footerClassName}
-        />
+        />   
       </ModalContainer>
     </div>
   )

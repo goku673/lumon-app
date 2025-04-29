@@ -8,14 +8,6 @@ export const registerApi = createApi({
   }),
 
   endpoints: (builder) => ({
-
-    postIncriptionGuardian: builder.mutation({
-      query: (data) => ({
-        url: '/guardians',
-        method: 'POST',
-        body: data,
-      }),
-    }),
     postIncriptionCompetitor: builder.mutation({
       query: (data) => ({
         url: '/competitors',
@@ -40,7 +32,6 @@ export const registerApi = createApi({
 });
 
 export const {
-  usePostIncriptionGuardianMutation,
   usePostIncriptionCompetitorMutation,
   useGetGradesQuery,
   useGetCompetitorsQuery,
