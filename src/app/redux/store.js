@@ -3,8 +3,10 @@ import { registerApi } from "./services/register";
 import { areaApi } from "./services/areaApi";
 import { guardiansApi } from "./services/guardiansApi";
 import guardianReducer from "./slice/guardianSlice";
+import olympicReducer from "./slice/olympicsSlice";
 import { schoolApi } from "./services/schoolApi";
 import { olympicsApi } from "./services/olympicsApi";
+
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +16,7 @@ export const store = configureStore({
     [schoolApi.reducerPath]: schoolApi.reducer,
     [olympicsApi.reducerPath]: olympicsApi.reducer,
     guardian: guardianReducer,
+    olympic: olympicReducer,
   },
   
   middleware : (getDefaulMiddleware) => 

@@ -14,8 +14,13 @@ import FilterListIcon from "@mui/icons-material/FilterList"
 import ButtonSE from "@/common/ButtonSE"
 import FormContainer from "@/common/formContainer"
 import Title from "@/common/title"
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedOlympic, clearSelectedOlympic } from "@/app/redux/slice/olympicsSlice"
+
 
 export default function OlympicsList() {
+    const dispatch = useDispatch();
+    const selectedOlympic = useSelector((state) => state.olympic.selectedOlympic);
     const { data: olympics = [], isLoading, error } = useGetOlympicsQuery()
     const [selected, setSelected] = useState(null)
   
@@ -104,7 +109,15 @@ export default function OlympicsList() {
                   className="w-full"
                   style={{ backgroundColor: selected?.id === o.id ? "#0f2e5a" : undefined }}
                   variant={selected?.id === o.id ? undefined : "outline"}
-                  onClick={() => setSelected(o)}
+                  onClick={() => {
+                    if (selected?.id === o.id) {
+                      dispatch(clearSelectedOlympic());
+                      setSelected(null);
+                    } else {
+                      dispatch(setSelectedOlympic(o));
+                      setSelected(o);
+                    }
+                  }}
                 >
                   {selected?.id === o.id ? "Seleccionada" : "Seleccionar"}
                 </ButtonSE>
