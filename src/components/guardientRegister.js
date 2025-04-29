@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CloseIcon from "@mui/icons-material/Close"; // Ícono para la "X"
 import Button from "@/common/button";
 import Input from "@/common/input";
 import Select from "@/common/select";
@@ -9,7 +10,11 @@ import FileUploader from "@/components/fileUploader";
 import FormContainer from "@/common/formContainer";
 import FormContent from "@/common/formContent";
 import Title from "@/common/title";
+import Text from "@/common/text";
+import { useGetGuardiansQuery } from "@/app/redux/services/guardiansApi";
 import { inputFieldsGuardians } from "@/utils/inputFieldsGuardians";
+import Selector from "./selector";
+import Modal from "./modal/modal";
 
 const options = [
   { value: "", label: "Seleccione una opción" },
@@ -19,6 +24,9 @@ const options = [
 ];
 
 const GuardianRegister = ({ onSubmit, initialData }) => {
+  const { data: guardians = [] } = useGetGuardiansQuery();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     apellidoPaterno: "",
     apellidoMaterno: "",
@@ -27,6 +35,7 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     celular: "",
     comprobantePago: null,
     tipo: "",
+    selectedGuardians: [],
     ...initialData,
   });
 
@@ -46,16 +55,80 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleGuardianSelect = (guardian) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedGuardians: [...prev.selectedGuardians, guardian],
+    }));
+  };
+
+  const handleGuardianRemove = (guardian) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedGuardians: prev.selectedGuardians.filter(
+        (g) => g.id !== guardian.id
+      ),
+    }));
+  };
+
+  const isFormValid = () => {
+    const {
+      apellidoPaterno,
+      apellidoMaterno,
+      nombres,
+      email,
+      celular,
+      comprobantePago,
+      tipo,
+      selectedGuardians,
+    } = formData;
+    const manualFilled =
+      apellidoPaterno &&
+      apellidoMaterno &&
+      nombres &&
+      email &&
+      celular &&
+      comprobantePago &&
+      tipo;
+    const hasSelection = selectedGuardians.length > 0;
+
+    return manualFilled || hasSelection;
+  };
+
+  const handleSubmit = e => {
     e.preventDefault();
+    if (!isFormValid()) {
+      setIsModalOpen(true);
+      return;
+    }
+    console.log("Form data:", formData);
     onSubmit(formData);
   };
 
   return (
+    <> 
     <FormContainer>
       <Title
         title="DATOS DE PROFESOR/TUTOR (OPCIONAL)"
         className="text-xl md:text-2xl font-medium mb-6"
+      />
+
+      <div className="mb-6">
+        <FormGroup label="Buscar y seleccionar Tutores:">
+          <Selector
+            items={guardians}
+            selectedItems={formData.selectedGuardians}
+            onSelect={handleGuardianSelect}
+            onRemove={handleGuardianRemove}
+            isMultiSelect={true}
+            placeholder="Buscar tutor..."
+            labelKey="name"
+          />
+        </FormGroup>
+      </div>
+      <Text
+        text="Si no encuentras el tutor puedes registrarlo"
+        className="text-lg font-medium mb-2"
       />
       <FormContent onSubmit={handleSubmit}>
         {inputFieldsGuardians.map((group, index) => (
@@ -67,25 +140,23 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
                   type={field.type}
                   name={field.name}
                   placeholder={field.placeholder}
-                  
                   value={formData[field.name]}
                   onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
               ))}
             </div>
           </FormGroup>
         ))}
-
         <FormGroup label="Tipo de Tutor:">
           <Select
-            className="w-full px-3 py-2 border"
             name="tipo"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
             value={formData.tipo}
             onChange={handleChange}
             options={options}
           />
         </FormGroup>
-
         <FormGroup label="Comprobante de pago:">
           <FileUploader
             name="comprobantePago"
@@ -99,8 +170,8 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
             </p>
           )}
         </FormGroup>
-
         <Button
+          
           type="submit"
           className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-md flex items-center justify-center"
         >
@@ -108,7 +179,20 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
           Continuar
         </Button>
       </FormContent>
-    </FormContainer>
+      </FormContainer>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Datos Incompletos"
+        primaryButtonText="Entendido"
+        secondaryButtonText="Cancelar"
+        onPrimaryClick={() => setIsModalOpen(false)}
+        onSecondaryClick={() => setIsModalOpen(false)}
+      >
+        <p>Por favor, registre sus datos antes de continuar.</p>
+      </Modal>
+    </>
+    
   );
 };
 

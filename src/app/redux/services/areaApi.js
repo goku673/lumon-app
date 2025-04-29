@@ -7,6 +7,7 @@ export const areaApi = createApi({
     baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
   }),
 
+  // change area_level_grades
   endpoints: (builder) => ({
     getAreas : builder.query({
       query: () => ({
@@ -14,13 +15,13 @@ export const areaApi = createApi({
         method: 'GET',
       }),
     }),
-    getProvinces : builder.query({
+    getProvinces: builder.query({
       query: () => ({
         url: '/provinces',
         method: 'GET',
       }),
     }),
-    getDepartments : builder.query({
+    getDepartments: builder.query({
       query: () => ({
         url: '/departments',
         method: 'GET',
@@ -39,6 +40,12 @@ export const areaApi = createApi({
         method: 'DELETE',
       }),
     }),
+    getAreaLevelGrades: builder.query({
+      query: () => ({
+        url: '/areas_levels_grades',
+        method: 'GET',
+      }),
+    }),
   })
 });
 
@@ -48,4 +55,5 @@ export const {
   useGetDepartmentsQuery,
   usePostAreaMutation,
   useDeleteAreaMutation,
+  useGetAreaLevelGradesQuery,
 } = areaApi;

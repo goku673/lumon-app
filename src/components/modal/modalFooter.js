@@ -13,7 +13,7 @@ export const ModalFooter = ({
     <div className={`flex justify-end p-4 gap-3 ${className}`}>
       {secondaryButtonText && (
         <Button
-          className="bg-blue-600 text-white border-none rounded px-4 py-2 font-medium cursor-pointer min-w-[100px]"
+          className="bg-[#0f2e5a] text-white border-none rounded px-4 py-2 font-medium cursor-pointer min-w-[100px]"
           onClick={onSecondaryClick}
         >
           {secondaryButtonText}
