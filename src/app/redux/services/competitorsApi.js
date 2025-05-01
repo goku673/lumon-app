@@ -28,10 +28,35 @@ export const competitorsApi = createApi({
       }),
       invalidatesTags: [{ type: 'Competitor', id: 'LIST' }],
     }),
+    deleteCompetitor: builder.mutation({
+      query: (id) => ({
+        url: `competitors/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [{ type: 'Competitor', id: 'LIST' }],
+    }), 
+    getCompetitor: builder.query({
+      query: (id) => ({
+        url: `competitors/${id}`,
+        method: 'GET',
+      }),
+     
+    }),
+    updateCompetitor: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `competitors/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: [{ type: 'Competitor', id: 'LIST' }],
+    }),
   }),
 });
 
 export const {
   useGetCompetitorsQuery,
   usePostInscriptionCompetitorMutation,
+  useDeleteCompetitorMutation,
+  useGetCompetitorQuery,
+  useUpdateCompetitorMutation,
 } = competitorsApi;
