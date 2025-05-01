@@ -1,13 +1,12 @@
-"use client"
+"use client";
+
 import { useState, useEffect } from "react";
 import RegisterAreaLevelGradeComponent from "./areaLevelGradeRegister";
 import Table from "./table";
 import Button from "@/common/button";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { useGetAreasQuery, useDeleteAreaMutation } from "@/app/redux/services/areaApi";
-import { useGetLevelsQuery } from "@/app/redux/services/levelsApi";
-import { useGetGradesQuery } from "@/app/redux/services/register";
+import { useGetAreaLevelsGradesQuery, useDeleteAreaLevelsGradesMutation } from "@/app/redux/services/areaLevelsGrades";
 import Modal from "./modal/modal";
 import RegisterArea from "./areaRegister";
 import RegisterGrade from "./gradeRegister";
@@ -17,54 +16,61 @@ import { TabsList } from "./tabs/tabsList"
 import { TabsTrigger } from "./tabs/tabsTrigger"
 import { Tabs } from "./tabs/tabs"
 
-
 const TabsRegister = () => {
-  const { data: areas, isLoading: isAreasLoading, isError: isAreasError,  refetch: refetchAreas, } = useGetAreasQuery();
-  const { refetch: refetchLevels } = useGetLevelsQuery();
-  const { refetch: refetchGrades } = useGetGradesQuery();
-  const [deleteArea] = useDeleteAreaMutation();
+  const { data: areaLevelGrades, isLoading, isError, refetch } = useGetAreaLevelsGradesQuery();
+  const [deleteAssociation] = useDeleteAreaLevelsGradesMutation();
   const [activeTab, setActiveTab] = useState("registerArea");
-  const [modal, setModal] = useState({ open: false, title: '', type: 'info', message: '' });
+  const [modal, setModal] = useState({ open: false, title: '', type: 'info', message: '', id: null });
 
-  const handleDeleteArea = async (id) => {
+  const closeModal = () => setModal(prev => ({ ...prev, open: false, id: null }));
+
+  const handleDelete = async () => {
     try {
-      await deleteArea(id).unwrap();
-      setModal({ open: true, title: 'Éxito', type: 'success', message: `Área con id ${id} eliminada exitosamente` });
-      refetch();
+      if (modal.id) {
+        await deleteAssociation(modal.id).unwrap();
+        setModal({ open: true, title: "Éxito", type: "success", message: "Asociación eliminada correctamente.", id: null });
+        refetch();
+      }
     } catch (error) {
-      console.error("Error al eliminar el área:", error);
-      setModal({ open: true, title: 'Error', type: 'error', message: 'Error al eliminar el área' });
+      console.error("Error al eliminar asociación:", error);
+      setModal({ open: true, title: "Error", type: "error", message: "No se pudo eliminar la asociación.", id: null });
     }
   };
 
-  useEffect(() => {
-    if (["registerArea", "registerGrade", "registerLevel", "registerAreaLevelGrade"].includes(activeTab)) {
-      refetchAreas();
-      refetchLevels();
-      refetchGrades();
-    }
-  }, [activeTab, refetchAreas, refetchLevels, refetchGrades]);
-
-  const closeModal = () => setModal(prev => ({ ...prev, open: false }));
+  const flattenedData = areaLevelGrades?.flatMap((area) =>
+    area.levels.flatMap((level) =>
+      level.grades.map((grade) => ({
+        id: grade.area_level_grade_id,
+        name: area.name,
+        nivel: level.name,
+        grado: grade.name,
+        costo: grade.price,
+        description: "-",
+      }))
+    )
+  ) || [];
 
   const columns = [
-    { accessorKey: "id", header: "Id Área", cell: info => info.getValue() },
+    { accessorKey: "id", header: "ID", cell: info => info.getValue() },
     { accessorKey: "name", header: "Área", cell: info => info.getValue() },
-    { accessorKey: "nivel", header: "Nivel/Categoría", cell: info => info.getValue() },
-    { accessorKey: "grado", header: "Grado Asociado", cell: info => info.getValue() },
+    { accessorKey: "nivel", header: "Nivel", cell: info => info.getValue() },
+    { accessorKey: "grado", header: "Grado", cell: info => info.getValue() },
     { accessorKey: "costo", header: "Costo (Bs)", cell: info => info.getValue() },
     { accessorKey: "description", header: "Descripción", cell: info => info.getValue() },
     {
       id: "actions",
       header: "Acciones",
       cell: info => {
-        const areaId = info.row.original.id;
+        const id = info.row.original.id;
         return (
           <div className="flex space-x-2 justify-center">
             <Button className="p-1 bg-green-500 text-white rounded hover:bg-green-600">
               <EditIcon />
             </Button>
-            <Button onClick={() => handleDeleteArea(areaId)} className="p-1 bg-red-500 text-white rounded hover:bg-red-600">
+            <Button
+              onClick={() => setModal({ open: true, title: "Confirmar Eliminación", type: "warning", message: `¿Eliminar registro con ID ${id}?`, id })}
+              className="p-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
               <DeleteIcon />
             </Button>
           </div>
@@ -80,9 +86,9 @@ const TabsRegister = () => {
           <TabsList className="mb-4 max-w-4xl w-full justify-center">
             <TabsTrigger value="registerArea">Registrar Área</TabsTrigger>
             <TabsTrigger value="registerGrade">Registrar Grado</TabsTrigger>
-            <TabsTrigger value="registerLevel">Registrar Level</TabsTrigger>
+            <TabsTrigger value="registerLevel">Registrar Nivel</TabsTrigger>
             <TabsTrigger value="registerAreaLevelGrade">Registrar Área–Nivel–Grado</TabsTrigger>
-            <TabsTrigger value="list">Ver Lista de Áreas</TabsTrigger>
+            <TabsTrigger value="list">Ver Lista de Asociaciones</TabsTrigger>
           </TabsList>
         </div>
 
@@ -106,14 +112,14 @@ const TabsRegister = () => {
           <div className="w-full overflow-x-auto px-4 py-8 flex justify-center">
             <div className="w-full max-w-7xl">
               <h1 className="text-lg font-bold text-center mb-4 text-white">
-                Lista de Área(s) Registradas
+                Lista de Área–Nivel–Grado Registradas
               </h1>
-              {isAreasLoading ? (
-                <p className="text-center text-gray-500">Cargando áreas...</p>
-              ) : isAreasError ? (
-                <p className="text-center text-red-500">Error al cargar las áreas</p>
+              {isLoading ? (
+                <p className="text-center text-gray-500">Cargando datos...</p>
+              ) : isError ? (
+                <p className="text-center text-red-500">Error al cargar los datos</p>
               ) : (
-                <Table columns={columns} data={areas} />
+                <Table columns={columns} data={flattenedData} />
               )}
             </div>
           </div>
@@ -125,8 +131,10 @@ const TabsRegister = () => {
         onClose={closeModal}
         title={modal.title}
         iconType={modal.type}
-        primaryButtonText="Aceptar"
-        onPrimaryClick={closeModal}
+        primaryButtonText={modal.type === "warning" ? "Eliminar" : "Aceptar"}
+        secondaryButtonText={modal.type === "warning" ? "Cancelar" : undefined}
+        onPrimaryClick={modal.type === "warning" ? handleDelete : closeModal}
+        onSecondaryClick={modal.type === "warning" ? closeModal : undefined}
       >
         <p className="text-gray-700">{modal.message}</p>
       </Modal>
@@ -136,4 +144,3 @@ const TabsRegister = () => {
 
 export default TabsRegister;
 
-    

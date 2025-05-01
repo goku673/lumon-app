@@ -40,16 +40,12 @@ export const inputFieldsCompetitor = [
           placeholder: "Ejemplo: 10/02/2024",
           pattern: "\\d{2}/\\d{2}/\\d{4}",
         },
-      ],
-    },
-    {
-      groupLabel: "Información Académica:",
-      fields: [
         {
-          name: "colegio",
-          type: "text",
-          placeholder: "Ingrese el Nombre de Su Colegio",
-        },
+            name: "celular",
+            type: "text",
+            placeholder: "Ejemplo: 78952345",
+        }
       ],
     },
+    
   ];
