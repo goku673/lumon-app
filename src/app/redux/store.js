@@ -9,7 +9,7 @@ import { olympicsApi } from "./services/olympicsApi";
 import { gradesApi } from "./services/gradesApi";
 import { levelsApi } from "./services/levelsApi";
 import { areaLevelsGradesApi } from "./services/areaLevelsGrades";
-
+import { competitorsApi } from "./services/competitorsApi";
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +21,7 @@ export const store = configureStore({
     [gradesApi.reducerPath]: gradesApi.reducer,
     [levelsApi.reducerPath]: levelsApi.reducer,
     [areaLevelsGradesApi.reducerPath]: areaLevelsGradesApi.reducer,
+    [competitorsApi.reducerPath]: competitorsApi.reducer,
     guardian: guardianReducer,
     olympic: olympicReducer,
   },
@@ -35,6 +36,7 @@ export const store = configureStore({
       gradesApi.middleware,
       levelsApi.middleware,
       areaLevelsGradesApi.middleware,
+      competitorsApi.middleware
     ),
 });
 

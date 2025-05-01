@@ -6,21 +6,23 @@ export const olympicsApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
   }),
-
+  tagTypes: ['Olympics'],
   endpoints: (builder) => ({
-    getOlympics : builder.query({
+    getOlympics: builder.query({
       query: () => ({
         url: '/olympics',
         method: 'GET',
       }),
+      providesTags: ['Olympics']
     }),
     postIncriptionOlympics: builder.mutation({
-        query: (data) => ({
-          url: '/olympics',
-          method: 'POST',
-          body: data,
-        }),
+      query: (data) => ({
+        url: '/olympics',
+        method: 'POST',
+        body: data,
       }),
+      invalidatesTags: ['Olympics']
+    }),
   })
 });
 

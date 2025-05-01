@@ -6,21 +6,23 @@ export const guardiansApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
   }),
-
+  tagTypes: ['Guardians'],
   endpoints: (builder) => ({
-    getGuardians : builder.query({
+    getGuardians: builder.query({
       query: () => ({
         url: '/guardians',
         method: 'GET',
       }),
+      providesTags: ['Guardians']
     }),
     postIncriptionGuardian: builder.mutation({
-        query: (data) => ({
-          url: '/guardians',
-          method: 'POST',
-          body: data,
-        }),
+      query: (data) => ({
+        url: '/guardians',
+        method: 'POST',
+        body: data,
       }),
+      invalidatesTags: ['Guardians']
+    }),
   })
 });
 

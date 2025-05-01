@@ -6,15 +6,15 @@ export const schoolApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
   }),
-
+  tagTypes: ['Schools'],
   endpoints: (builder) => ({
-    getSchools : builder.query({
+    getSchools: builder.query({
       query: () => ({
         url: '/schools',
         method: 'GET',
       }),
+      providesTags: ['Schools']
     }),
-    
   })
 });
 
