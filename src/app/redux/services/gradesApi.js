@@ -6,21 +6,23 @@ export const gradesApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
   }),
-
+  tagTypes: ['Grades'],
   endpoints: (builder) => ({
-    getGrades : builder.query({
+    getGrades: builder.query({
       query: () => ({
         url: '/grades',
         method: 'GET',
       }),
+      providesTags: ['Grades']
     }),
     postIncriptionGrades: builder.mutation({
-        query: (data) => ({
-          url: '/grades',
-          method: 'POST',
-          body: data,
-        }),
+      query: (data) => ({
+        url: '/grades',
+        method: 'POST',
+        body: data,
       }),
+      invalidatesTags: ['Grades']
+    }),
   })
 });
 

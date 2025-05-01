@@ -20,6 +20,12 @@ export const areaLevelsGradesApi = createApi({
         method: 'POST',
         body: data,
       }),
+    }),
+    deleteAreaLevelsGrades: builder.mutation({
+      query: (id) => ({
+        url: `/areas_levels_grades/${id}`,
+        method: 'DELETE',
+      }),
     }), 
   })
 });
@@ -27,4 +33,5 @@ export const areaLevelsGradesApi = createApi({
 export const {
     useGetAreaLevelsGradesQuery,
     usePostAreaLevelsGradesMutation,
+    useDeleteAreaLevelsGradesMutation,
 } = areaLevelsGradesApi;

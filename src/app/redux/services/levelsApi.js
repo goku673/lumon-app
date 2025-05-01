@@ -6,21 +6,23 @@ export const levelsApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
   }),
-
+  tagTypes: ['Levels'],
   endpoints: (builder) => ({
-    getLevels : builder.query({
+    getLevels: builder.query({
       query: () => ({
         url: '/levels',
         method: 'GET',
       }),
+      providesTags: ['Levels']
     }),
     postIncriptionLevels: builder.mutation({
-        query: (data) => ({
-          url: '/levels',
-          method: 'POST',
-          body: data,
-        }),
+      query: (data) => ({
+        url: '/levels',
+        method: 'POST',
+        body: data,
       }),
+      invalidatesTags: ['Levels']
+    }),
   })
 });
 
