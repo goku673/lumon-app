@@ -15,6 +15,7 @@ import { TabsContent } from "./tabs/tabsContent"
 import { TabsList } from "./tabs/tabsList"
 import { TabsTrigger } from "./tabs/tabsTrigger"
 import { Tabs } from "./tabs/tabs"
+import TableExporter from "./tableExporter";
 
 const TabsRegister = () => {
   const { data: areaLevelGrades, isLoading, isError, refetch } = useGetAreaLevelsGradesQuery();
@@ -64,9 +65,9 @@ const TabsRegister = () => {
         const id = info.row.original.id;
         return (
           <div className="flex space-x-2 justify-center">
-            <Button className="p-1 bg-green-500 text-white rounded hover:bg-green-600">
+            {/* <Button className="p-1 bg-[#00A86B] hover:bg-[#008f5b] text-white  rounded">
               <EditIcon />
-            </Button>
+            </Button> */}
             <Button
               onClick={() => setModal({ open: true, title: "Confirmar Eliminación", type: "warning", message: `¿Eliminar registro con ID ${id}?`, id })}
               className="p-1 bg-red-500 text-white rounded hover:bg-red-600"
@@ -78,6 +79,17 @@ const TabsRegister = () => {
       },
     },
   ];
+
+  const transformDataForExport = (data) => {
+    return data.map((item) => ({
+      "ID": item.id,
+      "Área": item.name,
+      "Nivel": item.nivel,
+      "Grado": item.grado,
+      "Costo (Bs)": item.costo,
+      "Descripción": item.description
+    }));
+  };
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center pt-8">
@@ -111,9 +123,23 @@ const TabsRegister = () => {
         <TabsContent value="list" className="w-full">
           <div className="w-full overflow-x-auto px-4 py-8 flex justify-center">
             <div className="w-full max-w-7xl">
-              <h1 className="text-lg font-bold text-center mb-4 text-white">
-                Lista de Área–Nivel–Grado Registradas
-              </h1>
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-lg font-bold text-white">
+                  Lista de Área–Nivel–Grado Registradas
+                </h1>
+                
+                {!isLoading && !isError && flattenedData.length > 0 && (
+                  <TableExporter 
+                    data={flattenedData}
+                    transformData={transformDataForExport}
+                    fileName="area_nivel_grado"
+                    sheetName="Asociaciones"
+                    buttonText="Exportar a Excel"
+                    className="bg-[#00A86B] hover:bg-[#008f5b] text-white font-bold py-2 px-4 rounded-md flex items-center"
+                  />
+                )}
+              </div>
+              
               {isLoading ? (
                 <p className="text-center text-gray-500">Cargando datos...</p>
               ) : isError ? (

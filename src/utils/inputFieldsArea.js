@@ -30,8 +30,12 @@ export const areaFields = [
 ];
 
 
-export const renderField = (fieldConfig, formData, handleChange, handleDescriptionChange) => {
+export const renderField = (fieldConfig, formData, handlers, dataProviders) => {
   const { type, name } = fieldConfig;
+  
+  // Asegúrate de que handlers sea un objeto y extraer las funciones específicas
+  const handleChange = typeof handlers === 'function' ? handlers : handlers?.handleChange;
+  const handleDescriptionChange = typeof handlers === 'function' ? handlers : handlers?.handleDescriptionChange;
   
   switch (type) {
     case "input":
@@ -41,7 +45,7 @@ export const renderField = (fieldConfig, formData, handleChange, handleDescripti
           type: "text",
           name: name,
           value: formData[name],
-          onChange: handleChange,
+          onChange: handleChange, // Asegúrate de que esto sea una función
           placeholder: fieldConfig.placeholder,
           required: fieldConfig.required,
           className: fieldConfig.className
@@ -53,7 +57,7 @@ export const renderField = (fieldConfig, formData, handleChange, handleDescripti
         props: {
           name: name,
           value: formData[name],
-          onChange: handleDescriptionChange,
+          onChange: handleDescriptionChange, // Asegúrate de que esto sea una función
           placeholder: fieldConfig.placeholder,
           rows: fieldConfig.rows,
           className: fieldConfig.className

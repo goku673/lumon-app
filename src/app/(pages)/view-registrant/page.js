@@ -6,21 +6,48 @@ import Button from "@/common/button"
 import SearchIcon from "@mui/icons-material/Search"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
-import DownloadIcon from "@mui/icons-material/Download"
 import Table from "@/components/table"
 import Modal from "@/components/modal/modal"
-import { useGetCompetitorsQuery } from "@/app/redux/services/competitorsApi"
+import { useGetCompetitorsQuery, useDeleteCompetitorMutation, useUpdateCompetitorMutation } from "@/app/redux/services/competitorsApi"
+import { useGetSchoolsQuery } from "@/app/redux/services/schoolApi"
+import { useGetGradesQuery } from "@/app/redux/services/register"
 import { format } from "date-fns"
 import Title from "@/common/title"
 import Text from "@/common/text"
-import * as XLSX from "xlsx"
+import TableExporter from "@/components/tableExporter"
+import FormGroup from "@/components/formGroup"
+import Selector from "@/components/selector"
+import Select from "@/common/select"
 
+//refactor code
 const ViewRegistrant = () => {
-  const { data: competitors = [] } = useGetCompetitorsQuery()
+  const { data: competitors = [], refetch } = useGetCompetitorsQuery()
+  const { data: schools, isLoading: isSchoolsLoading, isError: isSchoolsError } = useGetSchoolsQuery()
+  const { data: grades, isLoading: isGradesLoading, isError: isGradesError } = useGetGradesQuery()
+  const [deleteCompetitor] = useDeleteCompetitorMutation()
+  const [updateCompetitor] = useUpdateCompetitorMutation()
   const [searchTerm, setSearchTerm] = useState("")
   const [page, setPage] = useState(0)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
+  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' })
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    curso: "",
+    school_id: "",
+    colegio: null
+  })
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => {
+      setNotification({ show: false, message: '', type: 'success' });
+    }, 3000);
+  };
 
   const filteredData = competitors
     .map((c) => ({
@@ -32,11 +59,21 @@ const ViewRegistrant = () => {
       phone: c.phone || "-",
       curso: c.curso || "-",
       colegio: c.school?.name || "Sin colegio",
+      school_id: c.school?.id || "",
       provincia: c.school?.province_id || "-",
       area: c.area_level_grades?.map((a) => a.name).join(", ") || "-",
       tutores: c.guardians?.map((g) => `${g.name} ${g.last_name} (${g.type})`).join(", ") || "Sin tutores",
-      estado: "CONFIRMADO", // esto por ahora lo dejo hardcod, hasta que confirmemos el pago
+      estado: "CONFIRMADO",
       fechaRegistro: c.created_at ? format(new Date(c.created_at), "dd/MM/yyyy HH:mm") : "-",
+      original: {
+        name: c.name || "",
+        last_name: c.last_name || "",
+        email: c.email || "",
+        phone: c.phone || "",
+        curso: c.curso || "",
+        school_id: c.school?.id || "",
+        school: c.school || null
+      }
     }))
     .filter(
       (item) =>
@@ -48,42 +85,100 @@ const ViewRegistrant = () => {
 
   const openDeleteModal = (id) => {
     setSelectedId(id)
-    setIsModalOpen(true)
+    setIsDeleteModalOpen(true)
   }
 
-  const confirmDelete = () => {
-    setIsModalOpen(false)
+  const openEditModal = (id) => {
+    const competitor = filteredData.find(c => c.id === id)
+    if (competitor) {
+      setSelectedId(id)
+      setEditFormData({
+        name: competitor.original.name,
+        last_name: competitor.original.last_name,
+        email: competitor.original.email,
+        phone: competitor.original.phone,
+        curso: competitor.original.curso,
+        school_id: competitor.original.school_id,
+        colegio: competitor.original.school
+      })
+      setIsEditModalOpen(true)
+    }
   }
 
-  // Función para exportar datos a Excel
-  const exportToExcel = () => {
-    // Preparar los datos para exportar
-    const dataToExport = filteredData.map((item) => ({
-      ID: item.id,
+  const confirmDelete = async () => {
+    try {
+      await deleteCompetitor(selectedId).unwrap()
+      refetch()
+      setIsDeleteModalOpen(false)
+      showNotification("Competidor eliminado con éxito", "success")
+    } catch (error) {
+      console.error("Error al eliminar competidor:", error)
+      showNotification("Error al eliminar el competidor", "error")
+    }
+  }
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSchoolSelect = school => {
+    setEditFormData(prev => ({
+      ...prev,
+      colegio: school,
+      school_id: school.id
+    }))
+  }
+
+  const handleSchoolRemove = () => {
+    setEditFormData(prev => ({
+      ...prev,
+      colegio: null,
+      school_id: ""
+    }))
+  }
+
+  const confirmEdit = async () => {
+    try {
+      const dataToUpdate = {
+        name: editFormData.name,
+        last_name: editFormData.last_name,
+        phone: editFormData.phone,
+        curso: editFormData.curso,
+        school_id: editFormData.school_id
+      }
+      
+      await updateCompetitor({
+        id: selectedId,
+        data: dataToUpdate
+      }).unwrap()
+      refetch()
+      setIsEditModalOpen(false)
+      showNotification("Competidor actualizado con éxito", "success")
+    } catch (error) {
+      console.error("Error al actualizar competidor:", error)
+      showNotification("Error al actualizar el competidor", "error")
+    }
+  }
+
+  const transformDataForExport = (data) => {
+    return data.map((item) => ({
+      "ID": item.id,
       "Nombre y Apellido": item.name,
-      Email: item.email,
-      Carnet: item.carnet,
+      "Email": item.email,
+      "Carnet": item.carnet,
       "Fecha de Nacimiento": item.birthday,
-      Teléfono: item.phone,
-      Curso: item.curso,
-      Colegio: item.colegio,
-      Área: item.area,
-      Tutores: item.tutores,
-      Estado: item.estado,
+      "Teléfono": item.phone,
+      "Curso": item.curso,
+      "Colegio": item.colegio,
+      "Área": item.area,
+      "Tutores": item.tutores,
+      "Estado": item.estado,
       "Fecha de Registro": item.fechaRegistro,
     }))
-
-    // Crear una hoja de trabajo
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport)
-
-    // Crear un libro de trabajo
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Competidores")
-
-    // Generar el archivo Excel
-    const date = new Date()
-    const fileName = `competidores_${format(date, "yyyy-MM-dd_HH-mm")}.xlsx`
-    XLSX.writeFile(workbook, fileName)
   }
 
   const columns = [
@@ -117,7 +212,10 @@ const ViewRegistrant = () => {
         const registrantId = info.row.original.id
         return (
           <div className="flex space-x-2 justify-center">
-            <Button className="p-1 mb-1 bg-green-500 text-white rounded hover:bg-green-600">
+            <Button 
+              onClick={() => openEditModal(registrantId)}
+              className="p-1 mb-1 bg-green-500 text-white rounded hover:bg-green-600"
+            >
               <EditIcon fontSize="small" />
             </Button>
             <Button
@@ -134,10 +232,16 @@ const ViewRegistrant = () => {
 
   return (
     <div className="min-h-screen">
+      {notification.show && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg ${
+          notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {notification.message}
+        </div>
+      )}
+
       <div className="container mx-auto py-8 px-4">
         <Title title="Alumnos Registrados" className="text-2xl font-bold mb-6 text-white text-center" />
-
-        {/* Search and Export section - Centered search input */}
         <div className="flex flex-col items-center mb-8 gap-4">
           <div className="relative w-full max-w-xl mx-auto">
             <Input
@@ -147,48 +251,123 @@ const ViewRegistrant = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="absolute right-3 top-0 h-full flex items-center justify-center">
-              <SearchIcon />
-            </button>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <SearchIcon className="text-gray-400" />
+            </div>
           </div>
-
-          <Button
-            onClick={exportToExcel}
-            className="bg-[#00A86B] hover:bg-[#008f5b] text-white font-bold py-2 px-4 rounded-md flex items-center"
-          >
-            <DownloadIcon className="mr-2" />
-            Exportar a Excel
-          </Button>
+          
+          {filteredData.length > 0 && (
+            <TableExporter
+              data={filteredData}
+              transformData={transformDataForExport}
+              fileName="alumnos_registrados"
+              sheetName="Alumnos"
+              buttonText="Exportar a Excel"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex items-center"
+            />
+          )}
+        </div>
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <Table columns={columns} data={filteredData} />
         </div>
 
-        <div className="overflow-x-auto bg-white rounded-lg">
-          <Table
-            data={filteredData}
-            columns={columns}
-            page={page}
-            totalPages={1}
-            totalElements={filteredData.length}
-            className="w-full"
-            headerClassName="bg-[#1e4b8f] text-white"
-            rowClassName="border-b hover:bg-gray-50"
-          />
-        </div>
-
-        <div className="mt-4 text-center text-sm text-gray-300">Total de registros: {filteredData.length}</div>
+        <Modal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          title="Confirmar Eliminación"
+          iconType="warning"
+          primaryButtonText="Eliminar"
+          secondaryButtonText="Cancelar"
+          onPrimaryClick={confirmDelete}
+          onSecondaryClick={() => setIsDeleteModalOpen(false)}
+        >
+          <Text text="¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer." />
+        </Modal>
+        <Modal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          title="Editar Competidor"
+          iconType="info"
+          primaryButtonText="Guardar Cambios"
+          secondaryButtonText="Cancelar"
+          onPrimaryClick={confirmEdit}
+          onSecondaryClick={() => setIsEditModalOpen(false)}
+        >
+          <div className="space-y-4">
+            <FormGroup label="Nombre:">
+              <Input
+                name="name"
+                value={editFormData.name}
+                onChange={handleEditChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </FormGroup>
+            
+            <FormGroup label="Apellido:">
+              <Input
+                name="last_name"
+                value={editFormData.last_name}
+                onChange={handleEditChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </FormGroup>
+            
+            <FormGroup label="Email:">
+              <Input
+                name="email"
+                value={editFormData.email}
+                readOnly
+                disabled
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+              />
+              <Text text="El email no se puede modificar" className="text-xs text-gray-500 mt-1" />
+            </FormGroup>
+            
+            <FormGroup label="Teléfono:">
+              <Input
+                name="phone"
+                value={editFormData.phone}
+                onChange={handleEditChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </FormGroup>
+            
+            <FormGroup label="Seleccione Colegio:">
+              {isSchoolsLoading ? (
+                <p>Cargando colegios...</p>
+              ) : isSchoolsError ? (
+                <p>Error al cargar colegios.</p>
+              ) : (
+                <Selector
+                  items={schools}
+                  selectedItems={editFormData.colegio ? [editFormData.colegio] : []}
+                  onSelect={handleSchoolSelect}
+                  onRemove={handleSchoolRemove}
+                  isMultiSelect={false}
+                  placeholder="Buscar colegio..."
+                  labelKey="name"
+                />
+              )}
+            </FormGroup>
+            
+            <FormGroup label="Curso:">
+              <Select
+                name="curso"
+                options={
+                  isGradesLoading 
+                    ? [{ value: "", label: "Cargando cursos..." }] 
+                    : isGradesError 
+                        ? [{ value: "", label: "Error al cargar cursos" }] 
+                        : grades?.map(g => ({ value: g.description, label: g.description })) || []
+                }
+                value={editFormData.curso}
+                onChange={handleEditChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </FormGroup>
+          </div>
+        </Modal>
       </div>
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Confirmar eliminación"
-        iconType="warning"
-        primaryButtonText="Eliminar"
-        secondaryButtonText="Cancelar"
-        onPrimaryClick={confirmDelete}
-        onSecondaryClick={() => setIsModalOpen(false)}
-      >
-        <Text text="¿Estás seguro de que deseas eliminar este registro?" className="text-lg mb-4" />
-      </Modal>
     </div>
   )
 }
