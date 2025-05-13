@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { usePostIncriptionLevelsMutation } from "@/app/redux/services/levelsApi"
 import Button from "@/common/button"
 import Modal from "./modal/modal"
@@ -13,10 +13,15 @@ import CategoryIcon from "@mui/icons-material/Category"
 import DescriptionIcon from "@mui/icons-material/Description"
 import { levelFields, renderField } from "@/utils/inputFieldLevel"
 import RenderComponent from "./RenderComponent"
-
+import * as XLSX from 'xlsx'
+import { useExcelProcessor } from "@/app/services/exel/ExcelProcessor"
+import BatchProcessingUI from "@/app/services/exel/BatchProcessingUI"
+import CircularProgress from '@mui/material/CircularProgress'
 
 const RegisterLevel = () => {
   const [createLevel] = usePostIncriptionLevelsMutation()
+  const processingRef = useRef(false)
+  
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -26,6 +31,47 @@ const RegisterLevel = () => {
   const [modalMessage, setModalMessage] = useState("")
   const [modalType, setModalType] = useState("success")
   const [isDescriptionValid, setIsDescriptionValid] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState("")
+
+  const templateHeaders = ["name", "description"]
+  const templateExample = ["Básico", "Nivel básico de educación"]
+
+  const excelProcessor = useExcelProcessor({
+    processRecord: async (record) => {
+      if (!record.name) throw new Error("Datos incompletos en el registro")
+      const resp = await createLevel({ 
+        name: record.name, 
+        description: record.description || ""
+      }).unwrap()
+      return resp
+    },
+    onProgress: ({ current, total }) => {
+      if (processingRef.current) {
+        setLoadingMessage(`Procesando ${current} de ${total} registros...`)
+      }
+    },
+    onComplete: ({ success, failed }) => {
+      processingRef.current = false
+      setIsLoading(false)
+      
+      setTimeout(() => {
+        setModalType(success > 0 ? "success" : "warning")
+        setModalMessage(`Procesamiento completado. ${success} exitosos, ${failed} fallidos.`)
+        setIsModalOpen(true)
+      }, 500)
+    },
+    onError: (error) => {
+      processingRef.current = false
+      setIsLoading(false)
+      
+      setTimeout(() => {
+        setModalType("error")
+        setModalMessage(error.message || "Error en el procesamiento")
+        setIsModalOpen(true)
+      }, 500)
+    }
+  })
 
   useEffect(() => {
     const words = formData.description.trim() ? formData.description.trim().split(/\s+/) : []
@@ -82,21 +128,55 @@ const RegisterLevel = () => {
     }
   }
 
-  const renderComponent = (fieldConfig) => (
-    <RenderComponent
-      fieldConfig={fieldConfig}
-      formData={formData}
-      handlers={{
-        handleChange,
-        handleDescriptionChange
-      }}
-      renderField={renderField}
-    />
-  )
+  const renderComponent = (fieldConfig) => {
+    return (
+      <RenderComponent
+        fieldConfig={fieldConfig}
+        formData={formData}
+        handlers={{
+          handleChange,
+          handleDescriptionChange
+        }}
+        dataProviders={{}}
+        renderField={renderField}
+      />
+    )
+  }
+
+  const handleProcessRecords = (records) => {
+    // Limpiar listas anteriores antes de procesar nuevos registros
+    excelProcessor.clearResults?.() || []
+    
+    // Establecer el estado de procesamiento
+    processingRef.current = true
+    setIsLoading(true)
+    setLoadingMessage(`Procesando 0 de ${records.length} registros...`)
+    
+    // Iniciar el procesamiento
+    excelProcessor.processRecords(records)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    // Asegurarse de que el modal de carga también esté cerrado
+    setIsLoading(false)
+  }
 
   return (
     <FormContainer className="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-8 border border-gray-100">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">Crear Nuevo Nivel</h2>
+
+      <BatchProcessingUI
+        title="Carga Masiva por Excel"
+        onProcessRecords={handleProcessRecords}
+        onExportResults={() => excelProcessor.exportResults("resultados_niveles")}
+        templateHeaders={templateHeaders}
+        templateExample={templateExample}
+        processor={excelProcessor}
+        className="mb-8"
+      />
+
+      <h3 className="text-lg font-semibold mb-4 text-gray-700">Registro Manual</h3>
 
       <FormContent onSubmit={handleSubmit} className="space-y-6">
         {levelFields.map((group, index) => (
@@ -133,14 +213,15 @@ const RegisterLevel = () => {
       </FormContent>
 
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={modalType === "success" ? "Éxito" : "Error"}
-        iconType={modalType}
-        primaryButtonText="Aceptar"
-        onPrimaryClick={() => setIsModalOpen(false)}
+        isOpen={isLoading}
+        title="Procesando"
+        showCloseButton={false}
+        showButtons={false}
       >
-        <p className="text-gray-700">{modalMessage}</p>
+        <div className="flex flex-col items-center justify-center py-4">
+          <CircularProgress color="error" className="mb-4" />
+          <p>{loadingMessage}</p>
+        </div>
       </Modal>
     </FormContainer>
   )

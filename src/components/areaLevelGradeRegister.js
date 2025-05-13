@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { useState, useRef } from "react";
 import * as XLSX from 'xlsx';
 
 import { usePostAreaLevelsGradesMutation } from "@/app/redux/services/areaLevelsGrades";
@@ -26,6 +26,7 @@ const RegisterAreaLevelGradeComponent = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("success");
   const [loadingModal, setLoadingModal] = useState({ isOpen: false, message: "Procesando registros..." });
+  const processingRef = useRef(false);
   const templateHeaders = ["area_id", "level_id", "grade_ids"];
   const templateExample = [1, 2, "3,4,5"];
 
@@ -53,6 +54,34 @@ const RegisterAreaLevelGradeComponent = () => {
         area_name: areas?.find(a => a.id === parseInt(record.area_id))?.name || "Desconocido",
         level_name: levels?.find(l => l.id === parseInt(record.level_id))?.name || "Desconocido"
       };
+    },
+    onProgress: ({ current, total }) => {
+      if (processingRef.current) {
+        setLoadingModal({
+          isOpen: true,
+          message: `Procesando ${current} de ${total} registros...`
+        });
+      }
+    },
+    onComplete: ({ success, failed }) => {
+      processingRef.current = false;
+      
+      setTimeout(() => {
+        setLoadingModal({ isOpen: false, message: "" });
+        setModalType(success > 0 ? "success" : "warning");
+        setModalMessage(`Procesamiento completado. ${success} exitosos, ${failed} fallidos.`);
+        setIsModalOpen(true);
+      }, 500);
+    },
+    onError: (error) => {
+      processingRef.current = false;
+      
+      setTimeout(() => {
+        setLoadingModal({ isOpen: false, message: "" });
+        setModalType("error");
+        setModalMessage(error.message || "Error en el procesamiento");
+        setIsModalOpen(true);
+      }, 500);
     }
   });
 
@@ -88,24 +117,18 @@ const RegisterAreaLevelGradeComponent = () => {
   };
 
   const handleProcessRecords = (records) => {
+    // Limpiar listas anteriores antes de procesar nuevos registros
+    excelProcessor.clearResults?.() || [];
+    
+    // Establecer el estado de procesamiento
+    processingRef.current = true;
+    setLoadingModal({ 
+      isOpen: true, 
+      message: `Procesando 0 de ${records.length} registros...` 
+    });
+    
+    // Iniciar el procesamiento
     excelProcessor.processRecords(records);
-    
-    setLoadingModal({ isOpen: true, message: "Procesando registros..." });
-    
-    const progressInterval = setInterval(() => {
-      if (excelProcessor.isProcessing) {
-        setLoadingModal({
-          isOpen: true,
-          message: `Procesando registro ${excelProcessor.processedRecords} de ${excelProcessor.totalRecords}...`
-        });
-      } else {
-        clearInterval(progressInterval);
-        setLoadingModal({ isOpen: false, message: "" });
-        setModalType(excelProcessor.successList.length > 0 ? "success" : "error");
-        setModalMessage(`Procesamiento completado. ${excelProcessor.successList.length} exitosos, ${excelProcessor.failedList.length} fallidos.`);
-        setIsModalOpen(true);
-      }
-    }, 500);
   };
 
   return (
