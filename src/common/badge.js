@@ -11,7 +11,6 @@ export function Badge({ variant = "default", className = "", children, ...props 
         className={`inline-flex items-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 ${variantClasses[variant]} ${className}`}
         {...props}
       >
-        {/* Añadir el indicador verde solo para el variant "default" (activo) */}
         {variant === "default" && (
           <span className="relative mr-1.5 flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>

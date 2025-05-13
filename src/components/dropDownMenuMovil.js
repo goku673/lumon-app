@@ -3,11 +3,11 @@ import React from "react";
 const DropDownMenuMovil = ({ children, isMenuOpen, className }) => {
   return (
     <div className={`bg-white ${className}`}>
-      <div className="px-2  pb-3 space-y-1 sm:px-3">
+      <div className="space-y-1 p-4">
         {children}
       </div>
       <div
-        className="p-4 border-t"
+        className="border-t border-gray-200 pt-2 pb-4 px-4"
         style={{
           opacity: isMenuOpen ? 1 : 0,
           transform: isMenuOpen ? 'translateY(0)' : 'translateY(20px)',
@@ -15,7 +15,6 @@ const DropDownMenuMovil = ({ children, isMenuOpen, className }) => {
           transitionDelay: '500ms',
         }}
       >
-  
       </div>
     </div>
   );

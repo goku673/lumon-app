@@ -6,7 +6,7 @@ const RegisterArea = () => {
         <div>
             <TabsRegister />
         </div>
-    )
+    )         
 }
 
 export default RegisterArea;

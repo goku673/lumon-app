@@ -1,6 +1,5 @@
+import LoginPage from "@/components/login";
 const SignIn = () => (
-    <div>
-        {"aqui ira el componente de iniciar sesion"}
-    </div>
+    <LoginPage />
 )
 export default SignIn;

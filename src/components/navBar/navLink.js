@@ -27,7 +27,7 @@ const NavLinks = ({ links, isMenuOpen, setIsMenuOpen }) => {
           }}
         >
           <Link
-            href="/auth?signIn"
+            href="/auth/signIn"
             className="block px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700"
             onClick={() => setIsMenuOpen(false)}
           >

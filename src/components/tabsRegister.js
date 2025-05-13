@@ -169,4 +169,3 @@ const TabsRegister = () => {
 };
 
 export default TabsRegister;
-
