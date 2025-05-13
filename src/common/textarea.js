@@ -3,55 +3,46 @@
 import React from "react"
 import DescriptionIcon from "@mui/icons-material/Description"
 
-/**
- * Componente genérico de Textarea con contador de palabras
- * @param {Object} props - Propiedades del componente
- * @param {string} props.label - Etiqueta del textarea (opcional)
- * @param {number} props.wordCount - Número actual de palabras
- * @param {number} props.maxWords - Número máximo de palabras permitidas
- * @param {boolean} props.showWordCount - Indica si se debe mostrar el contador de palabras
- * @param {boolean} props.showIcon - Indica si se debe mostrar el ícono de descripción
- * @param {string} props.className - Clases adicionales para el textarea
- * @param {string} props.labelClassName - Clases adicionales para la etiqueta
- * @param {string} props.containerClassName - Clases adicionales para el contenedor
- * @returns {JSX.Element} - Componente de textarea
- */
-const Textarea = ({
-  label = "Descripción",
-  wordCount,
-  maxWords,
-  showWordCount = true,
-  showIcon = true,
-  className = "",
-  labelClassName = "",
-  containerClassName = "",
-  ...props
+const Textarea = ({ 
+  className, 
+  onChange, 
+  wordCount = 0, 
+  maxWords = 100, 
+  showWordCount = false,
+  showIcon = false,
+  ...props 
 }) => {
-  const isExceedingLimit = wordCount > maxWords;
-  
+  const handleChange = (e) => {
+    if (typeof onChange === 'function') {
+      onChange(e);
+    } else if (onChange && typeof onChange.handleDescriptionChange === 'function') {
+      onChange.handleDescriptionChange(e);
+    } else if (onChange && typeof onChange.handleChange === 'function') {
+      onChange.handleChange(e);
+    }
+  };
+
+  const isOverLimit = maxWords > 0 && wordCount > maxWords;
+
   return (
-    <div className={`w-full ${containerClassName}`}>
-      {(label || (showWordCount && wordCount !== undefined && maxWords !== undefined)) && (
-        <div className="flex justify-between w-full mb-2">
-          {label && (
-            <div className="flex items-center">
-              {showIcon && <DescriptionIcon className="mr-2" fontSize="small" />}
-              <span className={labelClassName}>{label}</span>
-            </div>
-          )}
-          {showWordCount && wordCount !== undefined && maxWords !== undefined && (
-            <span className={`text-sm ${isExceedingLimit ? "text-red-500 font-medium" : "text-gray-500"}`}>
-              {wordCount}/{maxWords} palabras
-            </span>
-          )}
+    <div className="w-full">
+      <div className="relative">
+        {showIcon && (
+          <div className="absolute top-3 left-3 text-gray-400">
+            <DescriptionIcon />
+          </div>
+        )}
+        <textarea
+          className={`w-full px-4 py-2 ${showIcon ? 'pl-10' : ''} border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 ${isOverLimit ? 'border-red-500 focus:ring-red-500' : ''} ${className}`}
+          onChange={handleChange}
+          {...props}
+        />
+      </div>
+      {showWordCount && (
+        <div className={`text-sm mt-1 text-right ${isOverLimit ? 'text-red-500' : 'text-gray-500'}`}>
+          {wordCount} / {maxWords} palabras
         </div>
       )}
-      <textarea
-        className={`w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none ${
-          isExceedingLimit ? "border-red-500" : ""
-        } ${className}`}
-        {...props}
-      />
     </div>
   );
 };
