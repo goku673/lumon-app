@@ -1,8 +1,13 @@
 'use client';
 import RegisterOlympic from '@/components/registerOlympic';
+import AuthGuard from '@/components/AuthGuard';
 
 const RegisterOlympicPage = () => {
-  return <RegisterOlympic />;
+  return (
+    <AuthGuard>
+      <RegisterOlympic />
+    </AuthGuard>
+  );
 };
 
 export default RegisterOlympicPage;

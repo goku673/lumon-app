@@ -19,6 +19,7 @@ import Input from "@/common/input";
 import Select from "@/common/select";
 import Selector from "./selector";
 
+
 const CompetitorRegister = ({ onSubmit, onBack, initialData = {}, guardians = [] }) => {
   const selectedOlympic = useSelector((state) => state.olympic.selectedOlympic);
   const { data: grades, isLoading: isGradesLoading, isError: isGradesError, error: gradesError } = useGetGradesQuery();

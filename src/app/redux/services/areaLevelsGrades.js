@@ -1,13 +1,14 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithAuth } from '../baseQueryWithAuth';
+
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const areaLevelsGradesApi = createApi({
   reducerPath: 'areaLevelsGradesApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
-  }),
+  baseQuery: baseQueryWithAuth,
 
-  endpoints: (builder) => ({
+  
+   endpoints: (builder) => ({
     getAreaLevelsGrades : builder.query({
       query: () => ({
         url: '/areas_levels_grades',

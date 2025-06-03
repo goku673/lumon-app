@@ -6,7 +6,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ComunicadoCard from "./ComunicadoCard";
 
-const ComunicadosCarousel = ({ comunicados = [] }) => {
+const ComunicadosCarousel = ({ comunicados = [], isLoading = false }) => {
   const carouselRef = useRef(null);
 
   const scrollLeft = () => {
@@ -20,6 +20,14 @@ const ComunicadosCarousel = ({ comunicados = [] }) => {
       carouselRef.current.scrollBy({ left: 300, behavior: 'smooth' });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="text-center text-white p-8">
+        Cargando comunicados...
+      </div>
+    );
+  }
 
   if (comunicados.length === 0) {
     return (

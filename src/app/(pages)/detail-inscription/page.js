@@ -1,11 +1,12 @@
 "use client";
 import React from "react";
-import { Grid, Box, Typography, Paper, Divider, Chip } from "@mui/material";
 import DetailInscriptionComponent from "@/components/detailIncription";
-
+import AuthGuard from "@/components/AuthGuard";
 
 const DetailInscription = () => (
-  <DetailInscriptionComponent/>
+  <AuthGuard>
+    <DetailInscriptionComponent />
+  </AuthGuard>
 );
 
 export default DetailInscription;

@@ -1,7 +1,6 @@
 import DetailField from "./form/DetailField";
 import NameFields from "./form/nameFields";
 import { useState } from "react";
-import { useGetCompetitorQuery } from "@/app/redux/services/competitorsApi";
 import Input from "@/common/input";
 import Button from "@/common/button";
 import SearchIcon from "@mui/icons-material/Search";
@@ -13,15 +12,19 @@ import { format } from "date-fns";
 import DetailSection from "./form/detailSection";
 import { Card, CardContent, CardHeader } from "./cards";
 import { es } from 'date-fns/locale';
+import { useSearchCompetitorByCiQuery } from "@/app/redux/services/competitorsApi";
 
 const DetailInscription = () => {
-  const [competitorId, setCompetitorId] = useState("");
-  const [searchId, setSearchId] = useState(null);
+  const [competitorCi, setCompetitorCi] = useState("");
+  const [searchCi, setSearchCi] = useState("");
   
-  const { data: competitor, isLoading, isError, error } = useGetCompetitorQuery(
-    searchId, 
-    { skip: !searchId }
+  const { data: competitors, isLoading, isError, error } = useSearchCompetitorByCiQuery(
+    searchCi, 
+    { skip: !searchCi }
   );
+  
+
+  const competitor = competitors && competitors.length > 0 ? competitors[0] : null;
 
   const splitLastName = (fullLastName) => {
     if (!fullLastName) return { firstLastName: "-", secondLastName: "-" };
@@ -37,14 +40,23 @@ const DetailInscription = () => {
   };
 
   const handleSearch = () => {
-    if (competitorId && !isNaN(competitorId)) {
-      setSearchId(parseInt(competitorId));
+    if (competitorCi) {
+      setSearchCi(competitorCi);
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
+    }
+  };
+
+  // Función para permitir solo números en el input
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    // Solo permitir números
+    if (/^\d*$/.test(value)) {
+      setCompetitorCi(value);
     }
   };
 
@@ -62,6 +74,7 @@ const DetailInscription = () => {
       case "pending":
         return { text: "Pendiente", color: "text-yellow-500", bgColor: "bg-yellow-100" };
       case "completed":
+      case "paid":
         return { text: "Completa", color: "text-green-500", bgColor: "bg-green-100" };
       case "rejected":
         return { text: "Rechazada", color: "text-red-500", bgColor: "bg-red-100" };
@@ -84,10 +97,10 @@ const DetailInscription = () => {
               <div className="relative w-full max-w-md mx-auto">
                 <Input
                   type="text"
-                  placeholder="Ingrese ID del competidor"
+                  placeholder="Ingrese CI del competidor"
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  value={competitorId}
-                  onChange={(e) => setCompetitorId(e.target.value)}
+                  value={competitorCi}
+                  onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
                 />
                 <div 
@@ -204,11 +217,13 @@ const DetailInscription = () => {
                 />
               </div>
 
-              <DetailField 
-                label="Área a la que se Inscribe:" 
-                value={competitor?.inscriptions?.[0]?.olympic?.name || "Sin inscripción"} 
-                className="bg-blue-100 shadow-sm rounded-lg p-3 font-medium"
-              />
+              {competitor.olympics && competitor.olympics.length > 0 && (
+                <DetailField 
+                  label="Área a la que se Inscribe:" 
+                  value={competitor.olympics[0]?.name || "Sin inscripción"} 
+                  className="bg-blue-100 shadow-sm rounded-lg p-3 font-medium"
+                />
+              )}
             </DetailSection>
 
             {competitor?.guardians && competitor.guardians.length > 0 && (
@@ -268,7 +283,7 @@ const DetailInscription = () => {
               </DetailSection>
             )}
 
-            {competitor.inscriptions && competitor.inscriptions.length > 0 && (
+            {competitor.olympics && competitor.olympics.length > 0 && competitor.olympics[0].inscriptions && (
               <DetailSection title={
                 <div className="flex items-center text-white">
                   <EventIcon className="mr-2 text-white" /> INFORMACIÓN DE INSCRIPCIÓN
@@ -277,25 +292,25 @@ const DetailInscription = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <DetailField 
                     label="Fecha de inscripción:" 
-                    value={formatDate(competitor.inscriptions[0].created_at)} 
+                    value={formatDate(competitor.olympics[0].date_ini)} 
                     className="bg-white shadow-sm rounded-lg p-3"
                   />
                   
                   <div className="mb-4">
                     <label className="block mb-1 text-sm font-medium">Estado Inscripción:</label>
-                    <div className={`w-full px-3 py-2 border rounded-md text-left ${getStatusInfo(competitor.inscriptions[0].status).bgColor} ${getStatusInfo(competitor.inscriptions[0].status).color} font-medium`}>
-                      {getStatusInfo(competitor.inscriptions[0].status).text}
+                    <div className={`w-full px-3 py-2 border rounded-md text-left ${getStatusInfo(competitor.olympics[0].inscriptions[0].status).bgColor} ${getStatusInfo(competitor.olympics[0].inscriptions[0].status).color} font-medium`}>
+                      {getStatusInfo(competitor.olympics[0].inscriptions[0].status).text}
                     </div>
                   </div>
                   
                   <div className="mb-4">
                     <label className="block mb-1 text-sm font-medium">Comprobante de pago</label>
                     <button 
-                      className={`w-full px-3 py-2 border rounded-md text-left flex items-center justify-between ${competitor.inscriptions[0].payment_order_id ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : "bg-gray-100 text-gray-500"} transition-colors`}
-                      disabled={!competitor.inscriptions[0].payment_order_id}
+                      className={`w-full px-3 py-2 border rounded-md text-left flex items-center justify-between ${competitor.olympics[0].inscriptions[0].payment_order_id ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : "bg-gray-100 text-gray-500"} transition-colors`}
+                      disabled={!competitor.olympics[0].inscriptions[0].payment_order_id}
                     >
-                      <span>{competitor.inscriptions[0].payment_order_id ? "Ver Comprobante" : "Sin comprobante"}</span>
-                      {competitor.inscriptions[0].payment_order_id && <ReceiptIcon />}
+                      <span>{competitor.olympics[0].inscriptions[0].payment_order_id ? "Ver Comprobante" : "Sin comprobante"}</span>
+                      {competitor.olympics[0].inscriptions[0].payment_order_id && <ReceiptIcon />}
                     </button>
                   </div>
                 </div>
@@ -303,7 +318,7 @@ const DetailInscription = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <DetailField 
                     label="Número Comprobante:" 
-                    value={competitor.inscriptions[0].payment_order_id || "-"} 
+                    value={competitor.olympics[0].inscriptions[0].payment_order_id || "-"} 
                     className="bg-white shadow-sm rounded-lg p-3"
                   />
                   <DetailField 
@@ -314,22 +329,25 @@ const DetailInscription = () => {
                     className="bg-white shadow-sm rounded-lg p-3"
                   />
                   <DetailField 
-                    label="Cod de Inscripción:" 
-                    value={competitor.inscriptions[0].id || "-"} 
+                    label="Área de Inscripción:" 
+                    value={competitor.olympics[0].inscriptions[0].areas?.area?.name || "-"} 
                     className="bg-purple-100 shadow-sm rounded-lg p-3 font-medium"
                   />
                 </div>
                 
-                {competitor.inscriptions[0].olympic && (
+                {competitor.olympics[0] && (
                   <div className="mt-6 bg-purple-50 p-4 rounded-lg">
                     <h3 className="font-medium mb-2 text-purple-800">Detalles de la Olimpiada:</h3>
-                    <p className="mb-2"><span className="font-medium">Nombre:</span> {competitor.inscriptions[0].olympic.name}</p>
-                    <p className="mb-2"><span className="font-medium">Descripción:</span> {competitor.inscriptions[0].olympic.description}</p>
+                    <p className="mb-2"><span className="font-medium">Nombre:</span> {competitor.olympics[0].name}</p>
+                    <p className="mb-2"><span className="font-medium">Descripción:</span> {competitor.olympics[0].description}</p>
                     <p className="mb-2">
-                      <span 
-                        className="font-medium"
-                        >Fechas:
-                      </span> Del {formatDate(competitor.inscriptions[0].olympic.date_ini)} al {formatDate(competitor.inscriptions[0].olympic.date_fin)}
+                      <span className="font-medium">Fechas:</span> Del {formatDate(competitor.olympics[0].date_ini)} al {formatDate(competitor.olympics[0].date_fin)}
+                    </p>
+                    <p className="mb-2">
+                      <span className="font-medium">Nivel:</span> {competitor.olympics[0].inscriptions[0].areas?.level?.name || "-"}
+                    </p>
+                    <p className="mb-2">
+                      <span className="font-medium">Grado:</span> {competitor.olympics[0].inscriptions[0].areas?.grade?.name || "-"}
                     </p>
                   </div>
                 )}
@@ -338,21 +356,21 @@ const DetailInscription = () => {
           </>
         )}
 
-        {!isLoading && !isError && !competitor && searchId && (
+        {!isLoading && !isError && (!competitors || competitors.length === 0) && searchCi && (
           <Card className="mb-8 shadow-md border-l-4 border-l-red-500">
             <CardContent>
               <div className="text-center text-red-500 text-lg">
-                No se encontró ningún competidor con el ID: {searchId}
+                No se encontró ningún competidor con el CI: {searchCi}
               </div>
             </CardContent>
           </Card>
         )}
 
-        {!searchId && (
+        {!searchCi && (
           <Card className="mb-8 shadow-md border-l-4 border-l-blue-300">
             <CardContent>
               <div className="text-center text-lg text-blue-800">
-                Ingrese un ID de competidor para ver sus detalles
+                Ingrese un CI de competidor para ver sus detalles
               </div>
             </CardContent>
           </Card>

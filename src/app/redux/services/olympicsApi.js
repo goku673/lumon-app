@@ -1,11 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithAuth } from '../baseQueryWithAuth';
+
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const olympicsApi = createApi({
   reducerPath: 'olympicsApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
-  }),
+  baseQuery: baseQueryWithAuth,
+
+  
   tagTypes: ['Olympics'],
   endpoints: (builder) => ({
     getOlympics: builder.query({
