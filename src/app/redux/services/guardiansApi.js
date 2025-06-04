@@ -1,11 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithAuth } from '../baseQueryWithAuth';
+
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const guardiansApi = createApi({
   reducerPath: 'guardiansApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
-  }),
+  baseQuery: baseQueryWithAuth,
+
   tagTypes: ['Guardians'],
   endpoints: (builder) => ({
     getGuardians: builder.query({

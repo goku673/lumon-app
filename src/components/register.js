@@ -9,16 +9,27 @@ import FormContent from "@/common/formContent";
 import Title from "@/common/title";
 import Text from "@/common/text";
 import { Person, Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
+import { useRegisterMutation } from "@/app/redux/services/authApi";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "@/app/redux/slice/userSlice";
+import Modal from "./modal/modal";
+
+
 
 const RegisterPage = () => {
   const router = useRouter();
+  const [openModal, setOpenModal] = useState(false);
+  const dispatch = useDispatch();
+  const [register] = useRegisterMutation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    password_confirmation: "",
+    is_admin: false,
   });
   const [error, setError] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -42,23 +53,28 @@ const RegisterPage = () => {
     e.preventDefault();
     setError("");
     
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.password || !formData.password_confirmation) {
       setError("Por favor complete todos los campos");
       return;
     }
     
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.password_confirmation) {
       setError("Las contraseñas no coinciden");
       return;
     }
     
     try {
-      console.log("Registrando usuario:", formData);
-      router.push("/auth/login");
+      
+     const response = await register(formData).unwrap();
+     setOpenModal(true);
+      
+      
     } catch (err) {
       setError("Error al registrar usuario. Inténtelo de nuevo.");
     }
   };
+
+ 
 
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -147,10 +163,10 @@ const RegisterPage = () => {
                 </div>
                 <Input
                   type={showConfirmPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  name="confirmPassword"
+                  id="password_confirmation"
+                  name="password_confirmation"
                   placeholder="Confirma tu contraseña"
-                  value={formData.confirmPassword}
+                  value={formData.password_confirmation}
                   onChange={handleChange}
                   required
                   className="pl-10 pr-10"
@@ -188,6 +204,17 @@ const RegisterPage = () => {
             </a>
           </div>
         </FormContainer>
+        <Modal
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+          title="Registro Exitoso"
+          iconType="success"
+          primaryButtonText="Aceptar"
+          onPrimaryClick={() => {
+            setOpenModal(false);
+            router.push("/auth/signIn");
+          }}
+        />
       </div>
     </div>
   );

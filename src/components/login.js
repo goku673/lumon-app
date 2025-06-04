@@ -9,14 +9,19 @@ import FormContent from "@/common/formContent";
 import Title from "@/common/title";
 import Text from "@/common/text";
 import { Email, Lock } from "@mui/icons-material";
+import { useLoginMutation } from "@/app/redux/services/authApi";
+import Modal from "./modal/modal";
 
 const LoginPage = () => {
+
   const router = useRouter();
+  const [login] = useLoginMutation();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
   const [error, setError] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,26 +31,33 @@ const LoginPage = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    
-    
-    
-    if (!formData.email || !formData.password) {
-      setError("Por favor complete todos los campos");
-      return;
-    }
-    
-    try {
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+
+  if (!formData.email || !formData.password) {
+    setError("Por favor complete todos los campos");
+    return;
+  }
+
+ try {
       
-      console.log("Iniciando sesión con:", formData);
-      
-      router.push("/");
-    } catch (err) {
-      setError("Error al iniciar sesión. Verifique sus credenciales.");
-    }
-  };
+
+   const response = await login(formData).unwrap();
+   if (response) {
+     localStorage.setItem("token", response?.token);
+     setShowSuccessModal(true);
+   }
+  } catch (err) {
+    console.error("Error al iniciar sesión:", err);
+    setError(err.data?.message || "Error al iniciar sesión");
+  }
+};
+
+const handleCloseModal = () => {
+  setShowSuccessModal(false);
+  window.location.href = "/";
+}
 
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -120,6 +132,18 @@ const LoginPage = () => {
           </div>
         </FormContainer>
       </div>
+      <Modal
+       isOpen={showSuccessModal}
+       onClose={handleCloseModal}
+       title="¡Inicio de sesión exitoso!"
+       iconType="success"
+       primaryButtonText="Aceptar"
+       onPrimaryClick={handleCloseModal}
+      >
+         <div className="text-center">
+          <p>Has iniciado sesión correctamente.</p>
+        </div>
+      </Modal>
     </div>
   );
 };

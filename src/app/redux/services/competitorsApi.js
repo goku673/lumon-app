@@ -1,15 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithAuth } from '../baseQueryWithAuth';
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const competitorsApi = createApi({
   reducerPath: 'competitorsApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${NEXT_PUBLIC_BASE_URL}/api`,
-    prepareHeaders: (headers) => {
-      headers.set('Accept', 'application/json');
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithAuth,
+  
   tagTypes: ['Competitor'],
   endpoints: (builder) => ({
     getCompetitors: builder.query({
@@ -19,6 +15,16 @@ export const competitorsApi = createApi({
       }),
       providesTags: (result = []) =>
         result.map((c) => ({ type: 'Competitor', id: c.id })),
+    }),
+    searchCompetitorByCi: builder.query({
+      query: (ci) => ({
+        url: `competitors/search?ci=${ci}`,
+        method: 'GET',
+      }),
+      providesTags: (result = []) =>
+        Array.isArray(result)
+          ? result.map((c) => ({ type: 'Competitor', id: c.id }))
+          : [],
     }),
     postInscriptionCompetitor: builder.mutation({
       query: (data) => ({
@@ -40,7 +46,6 @@ export const competitorsApi = createApi({
         url: `competitors/${id}`,
         method: 'GET',
       }),
-     
     }),
     updateCompetitor: builder.mutation({
       query: ({ id, data }) => ({
@@ -55,6 +60,7 @@ export const competitorsApi = createApi({
 
 export const {
   useGetCompetitorsQuery,
+  useSearchCompetitorByCiQuery,
   usePostInscriptionCompetitorMutation,
   useDeleteCompetitorMutation,
   useGetCompetitorQuery,

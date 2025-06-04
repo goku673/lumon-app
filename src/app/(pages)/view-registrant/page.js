@@ -1,25 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import Input from "@/common/input"
-import Button from "@/common/button"
-import SearchIcon from "@mui/icons-material/Search"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
-import Table from "@/components/table"
-import Modal from "@/components/modal/modal"
 import { useGetCompetitorsQuery, useDeleteCompetitorMutation, useUpdateCompetitorMutation } from "@/app/redux/services/competitorsApi"
 import { useGetSchoolsQuery } from "@/app/redux/services/schoolApi"
 import { useGetGradesQuery } from "@/app/redux/services/register"
 import { format } from "date-fns"
-import Title from "@/common/title"
-import Text from "@/common/text"
-import TableExporter from "@/components/tableExporter"
-import FormGroup from "@/components/formGroup"
-import Selector from "@/components/selector"
-import Select from "@/common/select"
+import ViewRegistrantComponent from "@/components/viewRegistanComponent"
+import Button from "@/common/button"
+import EditIcon from "@mui/icons-material/Edit"
+import DeleteIcon from "@mui/icons-material/Delete"
+import AuthGuard from "@/components/AuthGuard"
 
-//refactor code
 const ViewRegistrant = () => {
   const { data: competitors = [], refetch } = useGetCompetitorsQuery()
   const { data: schools, isLoading: isSchoolsLoading, isError: isSchoolsError } = useGetSchoolsQuery()
@@ -27,7 +18,6 @@ const ViewRegistrant = () => {
   const [deleteCompetitor] = useDeleteCompetitorMutation()
   const [updateCompetitor] = useUpdateCompetitorMutation()
   const [searchTerm, setSearchTerm] = useState("")
-  const [page, setPage] = useState(0)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
@@ -112,7 +102,6 @@ const ViewRegistrant = () => {
       setIsDeleteModalOpen(false)
       showNotification("Competidor eliminado con éxito", "success")
     } catch (error) {
-      console.error("Error al eliminar competidor:", error)
       showNotification("Error al eliminar el competidor", "error")
     }
   }
@@ -159,7 +148,6 @@ const ViewRegistrant = () => {
       setIsEditModalOpen(false)
       showNotification("Competidor actualizado con éxito", "success")
     } catch (error) {
-      console.error("Error al actualizar competidor:", error)
       showNotification("Error al actualizar el competidor", "error")
     }
   }
@@ -231,145 +219,35 @@ const ViewRegistrant = () => {
   ]
 
   return (
-    <div className="min-h-screen">
-      {notification.show && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg ${
-          notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-        }`}>
-          {notification.message}
-        </div>
-      )}
-
-      <div className="container mx-auto py-8 px-4">
-        <Title title="Alumnos Registrados" className="text-2xl font-bold mb-6 text-white text-center" />
-        <div className="flex flex-col items-center mb-8 gap-4">
-          <div className="relative w-full max-w-xl mx-auto">
-            <Input
-              type="text"
-              placeholder="Buscar por nombre, carnet, email o colegio"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2  bg-white"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <SearchIcon className="text-gray-400" />
-            </div>
-          </div>
-          
-          {filteredData.length > 0 && (
-            <TableExporter
-              data={filteredData}
-              transformData={transformDataForExport}
-              fileName="alumnos_registrados"
-              sheetName="Alumnos"
-              buttonText="Exportar a Excel"
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex items-center"
-            />
-          )}
-        </div>
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <Table columns={columns} data={filteredData} />
-        </div>
-
-        <Modal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          title="Confirmar Eliminación"
-          iconType="warning"
-          primaryButtonText="Eliminar"
-          secondaryButtonText="Cancelar"
-          onPrimaryClick={confirmDelete}
-          onSecondaryClick={() => setIsDeleteModalOpen(false)}
-        >
-          <Text text="¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer." />
-        </Modal>
-        <Modal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          title="Editar Competidor"
-          iconType="info"
-          primaryButtonText="Guardar Cambios"
-          secondaryButtonText="Cancelar"
-          onPrimaryClick={confirmEdit}
-          onSecondaryClick={() => setIsEditModalOpen(false)}
-        >
-          <div className="space-y-4">
-            <FormGroup label="Nombre:">
-              <Input
-                name="name"
-                value={editFormData.name}
-                onChange={handleEditChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </FormGroup>
-            
-            <FormGroup label="Apellido:">
-              <Input
-                name="last_name"
-                value={editFormData.last_name}
-                onChange={handleEditChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </FormGroup>
-            
-            <FormGroup label="Email:">
-              <Input
-                name="email"
-                value={editFormData.email}
-                readOnly
-                disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-              />
-              <Text text="El email no se puede modificar" className="text-xs text-gray-500 mt-1" />
-            </FormGroup>
-            
-            <FormGroup label="Teléfono:">
-              <Input
-                name="phone"
-                value={editFormData.phone}
-                onChange={handleEditChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </FormGroup>
-            
-            <FormGroup label="Seleccione Colegio:">
-              {isSchoolsLoading ? (
-                <p>Cargando colegios...</p>
-              ) : isSchoolsError ? (
-                <p>Error al cargar colegios.</p>
-              ) : (
-                <Selector
-                  items={schools}
-                  selectedItems={editFormData.colegio ? [editFormData.colegio] : []}
-                  onSelect={handleSchoolSelect}
-                  onRemove={handleSchoolRemove}
-                  isMultiSelect={false}
-                  placeholder="Buscar colegio..."
-                  labelKey="name"
-                />
-              )}
-            </FormGroup>
-            
-            <FormGroup label="Curso:">
-              <Select
-                name="curso"
-                options={
-                  isGradesLoading 
-                    ? [{ value: "", label: "Cargando cursos..." }] 
-                    : isGradesError 
-                        ? [{ value: "", label: "Error al cargar cursos" }] 
-                        : grades?.map(g => ({ value: g.description, label: g.description })) || []
-                }
-                value={editFormData.curso}
-                onChange={handleEditChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </FormGroup>
-          </div>
-        </Modal>
-      </div>
-    </div>
+  <AuthGuard>
+    <ViewRegistrantComponent
+      notification={notification}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      filteredData={filteredData}
+      columns={columns}
+      isDeleteModalOpen={isDeleteModalOpen}
+      setIsDeleteModalOpen={setIsDeleteModalOpen}
+      confirmDelete={confirmDelete}
+      isEditModalOpen={isEditModalOpen}
+      setIsEditModalOpen={setIsEditModalOpen}
+      editFormData={editFormData}
+      handleEditChange={handleEditChange}
+      isSchoolsLoading={isSchoolsLoading}
+      isSchoolsError={isSchoolsError}
+      schools={schools}
+      handleSchoolSelect={handleSchoolSelect}
+      handleSchoolRemove={handleSchoolRemove}
+      isGradesLoading={isGradesLoading}
+      isGradesError={isGradesError}
+      grades={grades}
+      confirmEdit={confirmEdit}
+      transformDataForExport={transformDataForExport}
+      openEditModal={openEditModal}
+      openDeleteModal={openDeleteModal}
+    />
+  </AuthGuard>
   )
 }
 
-export default ViewRegistrant
+export default ViewRegistrant;

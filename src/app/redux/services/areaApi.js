@@ -1,31 +1,33 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithAuth } from '../baseQueryWithAuth';
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const areaApi = createApi({
   reducerPath: 'areaApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: NEXT_PUBLIC_BASE_URL + '/api',
-  }),
-
-  // change area_level_grades
+  baseQuery: baseQueryWithAuth,
+  tagTypes: ['Areas', 'Provinces', 'Departments'],
+  
   endpoints: (builder) => ({
     getAreas : builder.query({
       query: () => ({
         url: '/areas',
         method: 'GET',
       }),
+      invalidatesTags: ['Areas'],
     }),
     getProvinces: builder.query({
       query: () => ({
         url: '/provinces',
         method: 'GET',
       }),
+      providesTags: ['Provinces']
     }),
     getDepartments: builder.query({
       query: () => ({
         url: '/departments',
         method: 'GET',
       }),
+      providesTags: ['Departments']
     }),
     postIncriptionArea : builder.mutation({
       query: (data) => ({
@@ -33,14 +35,16 @@ export const areaApi = createApi({
         method: 'POST',
         body: data,
       }),
+      invalidatesTags: ['Areas']
     }),
     deleteArea : builder.mutation({
       query: (id) => ({
         url: `/areas/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Areas'],
     }),
-    
+      
   })
 });
 

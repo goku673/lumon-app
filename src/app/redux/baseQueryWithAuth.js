@@ -1,0 +1,15 @@
+import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+
+const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+export const baseQueryWithAuth = fetchBaseQuery({
+  baseUrl: `${NEXT_PUBLIC_BASE_URL}/api`,
+  prepareHeaders: (headers) => {
+    headers.set('Accept', 'application/json');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
