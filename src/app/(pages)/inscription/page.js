@@ -3,7 +3,7 @@ import { useState } from "react";
 import { usePostInscriptionCompetitorMutation } from "@/app/redux/services/competitorsApi";
 import { usePostIncriptionGuardianMutation, useGetGuardiansQuery } from "@/app/redux/services/guardiansApi";
 import { useSelector } from "react-redux";
-import { useExcelProcessor } from "@/app/services/exel/ExcelProcessor";
+import useExcelProcessor from "@/app/services/exel/ExcelProcessor";
 import InscriptionForm from "@/components/InscriptionForm";
 import AuthGuard from "@/components/AuthGuard";
 
