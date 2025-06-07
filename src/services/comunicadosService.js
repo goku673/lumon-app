@@ -7,7 +7,7 @@ const MOCK_DATA = [
     titulo: 'Comunicado Importante',
     descripcion: 'Información relevante para todos los participantes de las olimpiadas.',
     imagen1: '/assets/comunicado1.jpg',
-    imagen2: '/assets/portada1.jpg'
+    imagen2: '/assets/portada1.jpg',
   },
   {
     titulo: 'Comunicado Importante',
