@@ -10,7 +10,7 @@ import Title from "@/common/title";
 import Text from "@/common/text";
 import { Email, Lock } from "@mui/icons-material";
 import { useLoginMutation } from "@/app/redux/services/authApi";
-import Modal from "./modal/modal";
+import Modal from "./modal/modal"; // Componente Modal personalizado para mostrar mensajes ....
 
 const LoginPage = () => {
 
@@ -54,6 +54,8 @@ const handleSubmit = async (e) => {
   }
 };
 
+
+// Función que  va cerrar el modal y redirijir al usuario al home
 const handleCloseModal = () => {
   setShowSuccessModal(false);
   window.location.href = "/";
@@ -127,6 +129,7 @@ const handleCloseModal = () => {
               href="/auth/signUp" 
               className="text-[#0f2e5a] hover:text-[#16488d]"
             >
+
               Regístrate aquí
             </a>
           </div>
@@ -140,6 +143,7 @@ const handleCloseModal = () => {
        primaryButtonText="Aceptar"
        onPrimaryClick={handleCloseModal}
       >
+
          <div className="text-center">
           <p>Has iniciado sesión correctamente.</p>
         </div>
