@@ -1,5 +1,6 @@
 "use client"
-
+//registrar view
+//a
 import { useState } from "react"
 import { useGetCompetitorsQuery, useDeleteCompetitorMutation, useUpdateCompetitorMutation } from "@/app/redux/services/competitorsApi"
 import { useGetSchoolsQuery } from "@/app/redux/services/schoolApi"
@@ -251,3 +252,66 @@ const ViewRegistrant = () => {
 }
 
 export default ViewRegistrant;
+//a
+//a
+//a
+
+//a
+//a
+//a
+//a
+
+//a
+
+//a
+//a
+
+//a
+//a
+//a
+//a
+
+//a
+//a
+//a
+//a
+//a
+
+//a
+//a
+//a
+//a
+//a
+//a
+//a
+//a
+//a
+//a
+//a
+//a
+
+//a
+//a
+//a
+//a
+//a
+
+//a
+//a
+//a
+
+//a
+//a
+//a
+//a
+//a
+//a
+//a
+//a
+
+
+//a
+//a
+
+//a
+//a
