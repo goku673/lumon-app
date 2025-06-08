@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <title>lumon app</title>
       </head>      
