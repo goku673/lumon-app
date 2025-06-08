@@ -12,3 +12,7 @@ const RegisterArea = () => {
 }
 
 export default RegisterArea;
+//Area de registro
+//documentacion en el manual tecnico
+//estructuracion 
+//siguiente
