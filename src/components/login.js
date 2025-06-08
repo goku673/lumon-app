@@ -12,7 +12,9 @@ import { Email, Lock } from "@mui/icons-material";
 import { useLoginMutation } from "@/app/redux/services/authApi";
 import Modal from "./modal/modal"; // Componente Modal personalizado para mostrar mensajes ....
 
+
 const LoginPage = () => {
+
 
   const router = useRouter();
   const [login] = useLoginMutation();
@@ -20,6 +22,7 @@ const LoginPage = () => {
     email: "",
     password: ""
   });
+
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -48,6 +51,7 @@ const handleSubmit = async (e) => {
      localStorage.setItem("token", response?.token);
      setShowSuccessModal(true);
    }
+
   } catch (err) {
     console.error("Error al iniciar sesión:", err);
     setError(err.data?.message || "Error al iniciar sesión");
@@ -56,12 +60,14 @@ const handleSubmit = async (e) => {
 
 
 // Función que  va cerrar el modal y redirijir al usuario al home
+
 const handleCloseModal = () => {
   setShowSuccessModal(false);
   window.location.href = "/";
 }
 
   return (
+
     <div className="flex justify-center items-center min-h-screen">
       <div className="w-full max-w-md">
         <FormContainer className="p-5">
@@ -81,6 +87,7 @@ const handleCloseModal = () => {
                   <Email className="text-gray-400" />
                 </div>
                 <Input
+
                   type="email"
                   id="email"
                   name="email"
@@ -89,17 +96,21 @@ const handleCloseModal = () => {
                   onChange={handleChange}
                   required
                   className="pl-10"
+
                 />
               </div>
             </div>
             
             <div>
+
               <Label htmlFor="password">Contraseña</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="text-gray-400" />
+
                 </div>
                 <Input
+
                   type="password"
                   id="password"
                   name="password"
@@ -108,6 +119,7 @@ const handleCloseModal = () => {
                   onChange={handleChange}
                   required
                   className="pl-10"
+
                 />
               </div>
             </div>
@@ -153,3 +165,6 @@ const handleCloseModal = () => {
 };
 
 export default LoginPage;
+
+//validaciones ya correjidas
+// para el formulario
