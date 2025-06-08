@@ -1,5 +1,6 @@
 'use client';
 
+// Importación de hooks, servicios y componentes necesarios
 import { useState, useEffect } from 'react';
 import { usePostIncriptionOlympicsMutation } from '@/app/redux/services/olympicsApi';
 import FormContainer from '@/common/formContainer';
@@ -20,8 +21,10 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
-const MAX_WORDS = 20;
 
+const MAX_WORDS = 20;  // Límite máximo de palabras permitidas en la descripción
+
+//para el estado inial del formulario 
 const RegisterOlympic = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -32,22 +35,28 @@ const RegisterOlympic = () => {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [modalType, setModalType] = useState('success');
+
   const [modalMessage, setModalMessage] = useState('');
+
   const [wordCount, setWordCount] = useState(0);
 
   const [postIncriptionOlympics, { isLoading }] = usePostIncriptionOlympicsMutation();
+
 
   useEffect(() => {
     const words = formData.description.trim() ? formData.description.trim().split(/\s+/) : [];
     setWordCount(words.length);
   }, [formData.description]);
 
+  // Manejador de cambios para los inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Manejador especial para controlar el límite de palabras en la descripción
   const handleDescriptionChange = (e) => {
     const newText = e.target.value;
     const words = newText.trim() ? newText.trim().split(/\s+/) : [];
@@ -57,6 +66,8 @@ const RegisterOlympic = () => {
     }
   };
 
+
+  //Para manejar el estado (activo/inactivo)
   const handleStatusChange = (newStatus) => {
     setFormData((prev) => ({
       ...prev,
@@ -64,9 +75,12 @@ const RegisterOlympic = () => {
     }));
   };
 
+  // para Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+
+    //Validación del límite de palabras
     const currentWords = formData.description.trim().split(/\s+/).filter(Boolean).length;
     if (currentWords > MAX_WORDS) {
       setModalType('error');
@@ -75,6 +89,7 @@ const RegisterOlympic = () => {
       return;
     }
 
+
     if (new Date(formData.date_fin) < new Date(formData.date_ini)) {
       setModalType('error');
       setModalMessage('La fecha de finalización no puede ser anterior a la de inicio');
@@ -82,6 +97,8 @@ const RegisterOlympic = () => {
       return;
     }
 
+
+    // Intento de envío de los datos al servidor
     try {
       await postIncriptionOlympics(formData).unwrap();
       setModalType('success');
@@ -97,9 +114,13 @@ const RegisterOlympic = () => {
     }
   };
 
+
+  // Cierra el modal
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
+
+    // Contenedor para los estilos del formulario
     <FormContainer className='max-w-2xl mx-auto rounded-xl shadow-md p-6 border border-gray-100'>
       <div className='flex items-center justify-center mb-8 bg-blue-50 py-4 rounded-lg'>
         <EmojiEventsIcon className='text-[#0f2e5a] mr-2' fontSize='large' />
@@ -119,6 +140,7 @@ const RegisterOlympic = () => {
           />
         </FormGroup>
 
+
         <FormGroup label='Descripción'>
           <Textarea
             id='description'
@@ -134,6 +156,7 @@ const RegisterOlympic = () => {
             required
           />
         </FormGroup>
+
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           <FormGroup label='Fecha de inicio'>
@@ -153,6 +176,7 @@ const RegisterOlympic = () => {
             </div>
           </FormGroup>
 
+
           <FormGroup label='Fecha de finalización'>
             <div className='relative'>
               <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500'>
@@ -171,6 +195,7 @@ const RegisterOlympic = () => {
           </FormGroup>
         </div>
 
+
         <FormGroup label='Estado'>
           <div className='flex gap-4 mt-2'>
             <ButtonSE
@@ -186,6 +211,7 @@ const RegisterOlympic = () => {
               {formData.status === 'active' && <CheckCircleIcon fontSize='small' className='mr-2' />}
               Activo
             </ButtonSE>
+
 
             <ButtonSE
               type='button'
@@ -225,13 +251,17 @@ const RegisterOlympic = () => {
         </div>
       </FormContent>
 
+
+
       <Modal
+
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         title={modalType === 'success' ? 'Éxito' : 'Error'}
         iconType={modalType}
         primaryButtonText='Aceptar'
         onPrimaryClick={handleCloseModal}
+        
       >
         <p className='text-gray-700'>{modalMessage}</p>
       </Modal>
@@ -239,4 +269,6 @@ const RegisterOlympic = () => {
   );
 };
 
+
 export default RegisterOlympic;
+
