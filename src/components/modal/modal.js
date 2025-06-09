@@ -33,6 +33,9 @@ const Modal = ({
     }
     onClose()
   }
+// Contenedor principal del modal, posicionando el contenido en el centro de la pantalla.
+// Se usa `fixed inset-0 z-50 flex items-center justify-center` para asegurar que el modal
+// se superponga correctamente sobre otros elementos y esté centrado.
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">

@@ -14,6 +14,7 @@ import { announcementsApi } from "./services/anuncementsApi";
 import { authApi } from "./services/authApi";
 
 export const store = configureStore({
+  //Reducer
   reducer: {
     [registerApi.reducerPath]: registerApi.reducer,
     [areaApi.reducerPath]: areaApi.reducer,
@@ -29,11 +30,12 @@ export const store = configureStore({
     guardian: guardianReducer,
     olympic: olympicReducer,
   },
-  
-  middleware : (getDefaulMiddleware) => 
+
+  //Middleware
+  middleware: (getDefaulMiddleware) =>
     getDefaulMiddleware().concat(
-      registerApi.middleware, 
-      areaApi.middleware, 
+      registerApi.middleware,
+      areaApi.middleware,
       guardiansApi.middleware,
       schoolApi.middleware,
       olympicsApi.middleware,
@@ -42,9 +44,8 @@ export const store = configureStore({
       areaLevelsGradesApi.middleware,
       competitorsApi.middleware,
       announcementsApi.middleware,
-      authApi.middleware,
+      authApi.middleware
     ),
 });
-
 
 //comentario

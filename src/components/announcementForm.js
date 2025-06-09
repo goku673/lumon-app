@@ -27,6 +27,7 @@ const AnnouncementForm = ({
   closeModal,
   showModal,
 }) => {
+  //Definir estados
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [image1, setImage1] = useState(initialImage1);
@@ -36,7 +37,7 @@ const AnnouncementForm = ({
   const [wordCount, setWordCount] = useState(
     initialDescription ? initialDescription.trim().split(/\s+/).length : 0
   );
-
+  //Definir referencias
   const image1Ref = useRef(null);
   const image2Ref = useRef(null);
 
@@ -57,7 +58,7 @@ const AnnouncementForm = ({
       reader.readAsDataURL(file);
     }
   };
-
+  //Definir funcion de cambio de imagen 2
   const handleImage2Change = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -67,7 +68,7 @@ const AnnouncementForm = ({
       reader.readAsDataURL(file);
     }
   };
-
+  //Definir funcion de reseteo
   const resetForm = () => {
     setTitle("");
     setDescription("");
@@ -79,7 +80,7 @@ const AnnouncementForm = ({
     if (image1Ref.current) image1Ref.current.value = "";
     if (image2Ref.current) image2Ref.current.value = "";
   };
-
+  //Definir funcion de envio
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
@@ -90,6 +91,7 @@ const AnnouncementForm = ({
       showModal("Por favor, ingrese una descripción para el anuncio", "error");
       return;
     }
+    //Definir envio
     await onSubmit({
       title,
       description,
@@ -99,16 +101,20 @@ const AnnouncementForm = ({
       showModal,
     });
   };
-
+  //Definir retorno
   return (
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8 text-white">{formTitle}</h1>
+        <h1 className="text-3xl font-bold text-center mb-8 text-white">
+          {formTitle}
+        </h1>
         <FormContainer>
           <FormContent onSubmit={handleSubmit} className="space-y-6">
             <Card>
               <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
-                <h2 className="text-xl font-medium text-[#0f2e5a]">Información del Anuncio</h2>
+                <h2 className="text-xl font-medium text-[#0f2e5a]">
+                  Información del Anuncio
+                </h2>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -142,7 +148,9 @@ const AnnouncementForm = ({
             </Card>
             <Card>
               <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
-                <h2 className="text-xl font-medium text-[#0f2e5a]">Imágenes del Anuncio</h2>
+                <h2 className="text-xl font-medium text-[#0f2e5a]">
+                  Imágenes del Anuncio
+                </h2>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -211,7 +219,13 @@ const AnnouncementForm = ({
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={modalType === "success" ? "¡Éxito!" : modalType === "error" ? "Error" : "Información"}
+        title={
+          modalType === "success"
+            ? "¡Éxito!"
+            : modalType === "error"
+            ? "Error"
+            : "Información"
+        }
         iconType={modalType}
         primaryButtonText="Aceptar"
         secondaryButtonText=""

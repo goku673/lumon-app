@@ -172,3 +172,8 @@ const Incription = () => {
 };
 
 export default Incription;
+
+// Este formulario de inscripción está envuelto en un AuthGuard,
+// lo que garantiza que solo los usuarios autenticados puedan acceder y completar el proceso.
+// Incluye múltiples propiedades y funciones para gestionar el flujo de inscripción,
+// la interacción con datos de guardianes y competidores, y la manipulación de archivos Excel.
