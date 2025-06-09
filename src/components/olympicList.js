@@ -60,7 +60,6 @@ export default function OlympicsList() {
       day: "numeric",
     });
 
-    
   if (error) {
     return (
       <div className="rounded-lg bg-red-50 p-6 text-center">
@@ -80,7 +79,7 @@ export default function OlympicsList() {
    * @returns {JSX.Element} Componente de cuadrícula con las tarjetas de olimpiadas
    */
 
-
+  
   const renderGrid = (list) => {
     if (isLoading) {
       return (
