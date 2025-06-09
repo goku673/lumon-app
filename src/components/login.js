@@ -12,73 +12,71 @@ import { Email, Lock } from "@mui/icons-material";
 import { useLoginMutation } from "@/app/redux/services/authApi";
 import Modal from "./modal/modal"; // Componente Modal personalizado para mostrar mensajes ....
 
+// Componente de login
 
 const LoginPage = () => {
-
-
+  // Hooks
   const router = useRouter();
   const [login] = useLoginMutation();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
+  // Estados
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  // Funciones
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+  // Funciones
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  if (!formData.email || !formData.password) {
-    setError("Por favor complete todos los campos");
-    return;
-  }
+    if (!formData.email || !formData.password) {
+      setError("Por favor complete todos los campos");
+      return;
+    }
 
- try {
-      
+    try {
+      // Llamada a la API
+      const response = await login(formData).unwrap();
+      if (response) {
+        localStorage.setItem("token", response?.token);
+        setShowSuccessModal(true);
+      }
+    } catch (err) {
+      console.error("Error al iniciar sesión:", err);
+      setError(err.data?.message || "Error al iniciar sesión");
+    }
+  };
 
-   const response = await login(formData).unwrap();
-   if (response) {
-     localStorage.setItem("token", response?.token);
-     setShowSuccessModal(true);
-   }
+  // Función que  va cerrar el modal y redirijir al usuario al home
 
-  } catch (err) {
-    console.error("Error al iniciar sesión:", err);
-    setError(err.data?.message || "Error al iniciar sesión");
-  }
-};
-
-
-// Función que  va cerrar el modal y redirijir al usuario al home
-
-const handleCloseModal = () => {
-  setShowSuccessModal(false);
-  window.location.href = "/";
-}
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    window.location.href = "/";
+  };
 
   return (
-
     <div className="flex justify-center items-center min-h-screen">
       <div className="w-full max-w-md">
         <FormContainer className="p-5">
           <Title title="Iniciar Sesión" className="mb-6" />
-          
+
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               {error}
             </div>
           )}
-          
           <FormContent onSubmit={handleSubmit} className="space-y-6">
             <div>
               <Label htmlFor="email">Correo Electrónico</Label>
@@ -87,7 +85,6 @@ const handleCloseModal = () => {
                   <Email className="text-gray-400" />
                 </div>
                 <Input
-
                   type="email"
                   id="email"
                   name="email"
@@ -96,21 +93,17 @@ const handleCloseModal = () => {
                   onChange={handleChange}
                   required
                   className="pl-10"
-
                 />
               </div>
             </div>
-            
-            <div>
 
+            <div>
               <Label htmlFor="password">Contraseña</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="text-gray-400" />
-
                 </div>
                 <Input
-
                   type="password"
                   id="password"
                   name="password"
@@ -119,44 +112,38 @@ const handleCloseModal = () => {
                   onChange={handleChange}
                   required
                   className="pl-10"
-
                 />
               </div>
             </div>
-            
-            <Button 
-              type="submit" 
+
+            <Button
+              type="submit"
               className="w-full bg-[#0f2e5a] hover:bg-[#16488d] text-white py-2 rounded-md"
             >
               Iniciar Sesión
             </Button>
           </FormContent>
-          
+
           <div className="mt-4 text-center">
-            <Text 
-              text="¿No tienes una cuenta?" 
-              className="inline mr-2"
-            />
-            <a 
-              href="/auth/signUp" 
+            <Text text="¿No tienes una cuenta?" className="inline mr-2" />
+            <a
+              href="/auth/signUp"
               className="text-[#0f2e5a] hover:text-[#16488d]"
             >
-
               Regístrate aquí
             </a>
           </div>
         </FormContainer>
       </div>
       <Modal
-       isOpen={showSuccessModal}
-       onClose={handleCloseModal}
-       title="¡Inicio de sesión exitoso!"
-       iconType="success"
-       primaryButtonText="Aceptar"
-       onPrimaryClick={handleCloseModal}
+        isOpen={showSuccessModal}
+        onClose={handleCloseModal}
+        title="¡Inicio de sesión exitoso!"
+        iconType="success"
+        primaryButtonText="Aceptar"
+        onPrimaryClick={handleCloseModal}
       >
-
-         <div className="text-center">
+        <div className="text-center">
           <p>Has iniciado sesión correctamente.</p>
         </div>
       </Modal>
