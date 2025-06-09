@@ -98,15 +98,25 @@ const TableExporter = ({
   };
 
   return (
+    // Botón personalizado reutilizable con estado de carga y exportación a Excel
     <Button
+      // Ejecuta la función exportToExcel al hacer clic
       onClick={exportToExcel}
+
+      // Aplica estilos personalizados pasados como prop
       className={className}
+
+      // Desactiva el botón si se está exportando o si no hay datos
       disabled={isExporting || data.length === 0}
     >
+      {/* Icono de descarga al lado del texto del botón */}
       <DownloadIcon className="mr-2" />
+
+      {/* Texto dinámico del botón según estado de exportación */}
       {isExporting ? "Exportando..." : buttonText}
     </Button>
   );
+
 };
 
 export default TableExporter;
