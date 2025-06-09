@@ -1,53 +1,58 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithAuth } from '../baseQueryWithAuth';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "../baseQueryWithAuth";
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+//Tipo de query
+//query: para obtener datos
+//mutation: para modificar datos
 
 export const areaApi = createApi({
-  reducerPath: 'areaApi',
+  //Definir reducerPath
+  reducerPath: "areaApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ['Areas', 'Provinces', 'Departments'],
-  
+  tagTypes: ["Areas", "Provinces", "Departments"],
+
+  //Definir endpoints
   endpoints: (builder) => ({
-    getAreas : builder.query({
+    getAreas: builder.query({
       query: () => ({
-        url: '/areas',
-        method: 'GET',
+        url: "/areas",
+        method: "GET",
       }),
-      invalidatesTags: ['Areas'],
+      invalidatesTags: ["Areas"],
     }),
     getProvinces: builder.query({
       query: () => ({
-        url: '/provinces',
-        method: 'GET',
+        url: "/provinces",
+        method: "GET",
       }),
-      providesTags: ['Provinces']
+      providesTags: ["Provinces"],
     }),
     getDepartments: builder.query({
       query: () => ({
-        url: '/departments',
-        method: 'GET',
+        url: "/departments",
+        method: "GET",
       }),
-      providesTags: ['Departments']
+      providesTags: ["Departments"],
     }),
-    postIncriptionArea : builder.mutation({
+    postIncriptionArea: builder.mutation({
       query: (data) => ({
-        url: '/areas',
-        method: 'POST',
+        url: "/areas",
+        method: "POST",
         body: data,
       }),
-      invalidatesTags: ['Areas']
+      invalidatesTags: ["Areas"],
     }),
-    deleteArea : builder.mutation({
+    deleteArea: builder.mutation({
       query: (id) => ({
         url: `/areas/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['Areas'],
+      invalidatesTags: ["Areas"],
     }),
-      
-  })
+  }),
 });
 
+//Exportar las queries y mutations
 export const {
   useGetAreasQuery,
   useGetProvincesQuery,
