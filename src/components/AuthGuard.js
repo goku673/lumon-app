@@ -1,4 +1,5 @@
 // Importaciones necesarias
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -10,11 +11,16 @@ import { useRouter } from "next/navigation";
  * si el usuario no está autenticado.
  *
  * @param {Object} props - Propiedades del componente
+ * 
  * @param {React.ReactNode} props.children - Componentes hijos que estarán protegidos
+ * 
  * @param {string} [props.tokenName="token"] - Nombre de la clave del token en el localStorage
+ * 
  * @param {string} [props.redirectTo="/auth/signIn"] - Ruta a la que redirigir si no hay token
+ * 
  * @returns {React.ReactNode} - Renderiza los hijos si hay token, de lo contrario redirige
  */
+
 export default function AuthGuard({
   children,
   tokenName = "token",
@@ -33,8 +39,19 @@ export default function AuthGuard({
     if (!token) {
       router.replace(redirectTo);
     }
+
   }, [router, tokenName, redirectTo]);
+
 
   // Renderiza los componentes hijos si existe el token, de lo contrario retorna null
   return children || null;
 }
+
+
+
+
+
+
+
+
+
