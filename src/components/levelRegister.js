@@ -18,18 +18,31 @@ import { useExcelProcessor } from "@/app/services/exel/ExcelProcessor"
 import BatchProcessingUI from "@/app/services/exel/BatchProcessingUI"
 import CircularProgress from '@mui/material/CircularProgress'
 
+
+
 const RegisterLevel = () => {
+
+  // Hook para mutación de creación de niveles
   const [createLevel] = usePostIncriptionLevelsMutation()
+  
+ // Referencia para controlar si se está procesando un archivo Excel
   const processingRef = useRef(false)
   
+  
+// Estado para manejar los datos del formulario
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     wordCount: 0
   })
+
+  
+// Estado del modal (mensajes de éxito/error)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMessage, setModalMessage] = useState("")
   const [modalType, setModalType] = useState("success")
+
+  // Validación de longitud de la descripción (máximo 10 palabras)
   const [isDescriptionValid, setIsDescriptionValid] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("")
@@ -44,7 +57,7 @@ const RegisterLevel = () => {
         name: record.name, 
         description: record.description || ""
       }).unwrap()
-      return resp
+      return resp 
     },
     onProgress: ({ current, total }) => {
       if (processingRef.current) {
@@ -65,6 +78,7 @@ const RegisterLevel = () => {
       processingRef.current = false
       setIsLoading(false)
       
+
       setTimeout(() => {
         setModalType("error")
         setModalMessage(error.message || "Error en el procesamiento")
@@ -78,6 +92,7 @@ const RegisterLevel = () => {
     setFormData(prev => ({ ...prev, wordCount: words.length }))
     setIsDescriptionValid(words.length <= 10)
   }, [formData.description])
+
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -103,6 +118,7 @@ const RegisterLevel = () => {
       return
     }
 
+    
     if (!isDescriptionValid) {
       setModalType("error")
       setModalMessage("La descripción no puede tener más de 10 palabras")

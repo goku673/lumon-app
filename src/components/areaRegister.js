@@ -1,7 +1,10 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+// Importamos el hook para realizar la mutación de crear área
 import { usePostIncriptionAreaMutation } from "@/app/redux/services/areaApi"
+
+
 import Button from "@/common/button"
 import Modal from "./modal/modal"
 import FormContainer from "@/common/formContainer"
@@ -10,42 +13,59 @@ import FormGroup from "./formGroup"
 import SaveIcon from "@mui/icons-material/Save"
 import { areaFields, renderField } from "@/utils/inputFieldsArea"
 import RenderComponent from "./RenderComponent"
+
+// Librerías para manejo de archivos Excel
 import * as XLSX from 'xlsx'
 import { useExcelProcessor } from "@/app/services/exel/ExcelProcessor"
 import BatchProcessingUI from "@/app/services/exel/BatchProcessingUI"
 import CircularProgress from '@mui/material/CircularProgress'
 
+// Componente principal para registrar un área nueva
 const RegisterArea = () => {
+  // Hook para llamada API que crea el área
   const [createArea] = usePostIncriptionAreaMutation()
+
+  // Ref para saber si hay procesamiento en curso
   const processingRef = useRef(false)
 
+
+    // Estado para manejar los datos del formulario
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     wordCount: 0
   })
 
+
+   // Estados para controlar la modal de mensajes
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMessage, setModalMessage] = useState("")
   const [modalType, setModalType] = useState("success")
 
+
+  // Estados para mostrar el modal de carga y su mensaje
   const [isLoading, setIsLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState("")
 
+
+  // Definimos los encabezados y ejemplo para el Excel de carga masiva
   const templateHeaders = ["name", "description"]
   const templateExample = ["Matemáticas", "Área de matemáticas y lógica"]
 
   const excelProcessor = useExcelProcessor({
+
     processRecord: async (record) => {
       if (!record.name) throw new Error("Datos incompletos en el registro")
       const resp = await createArea({ name: record.name, description: record.description || "" }).unwrap()
       return resp
+
     },
     onProgress: ({ current, total }) => {
       if (processingRef.current) {
         setLoadingMessage(`Procesando ${current} de ${total} registros...`)
       }
     },
+
     onComplete: ({ success, failed }) => {
       processingRef.current = false
       setIsLoading(false)
@@ -61,6 +81,7 @@ const RegisterArea = () => {
       processingRef.current = false
       setIsLoading(false)
       
+
       // Usar setTimeout para asegurar que el modal de carga se cierre primero
       setTimeout(() => {
         setModalType("error")
@@ -80,6 +101,7 @@ const RegisterArea = () => {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+
   const handleDescriptionChange = (e) => {
     const value = e.target.value
     const words = value.trim() ? value.trim().split(/\s+/) : []
@@ -87,6 +109,7 @@ const RegisterArea = () => {
       setFormData(prev => ({ ...prev, description: value }))
     }
   }
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -114,6 +137,7 @@ const RegisterArea = () => {
     // Limpiar listas anteriores antes de procesar nuevos registros
     excelProcessor.clearResults()
     
+
     // Establecer el estado de procesamiento
     processingRef.current = true
     setIsLoading(true)
@@ -135,6 +159,7 @@ const RegisterArea = () => {
         Crear Nueva Área
       </h2>
 
+
       <BatchProcessingUI
         title="Carga Masiva por Excel"
         onProcessRecords={handleProcessRecords}
@@ -144,6 +169,7 @@ const RegisterArea = () => {
         processor={excelProcessor}
         className="mb-8"
       />
+
 
       <h3 className="text-lg font-semibold mb-4 text-gray-700">Registro Manual</h3>
       <FormContent onSubmit={handleSubmit} className="space-y-6">
@@ -175,6 +201,7 @@ const RegisterArea = () => {
           </FormGroup>
         ))}
 
+
         <div className="flex justify-end pt-4 border-t">
           <Button
             type="submit"
@@ -187,6 +214,7 @@ const RegisterArea = () => {
         </div>
       </FormContent>
 
+
       {/* Result Modal */}
       <Modal
         isOpen={isModalOpen}
@@ -197,6 +225,7 @@ const RegisterArea = () => {
         onPrimaryClick={handleCloseModal}
       >
         <p className="text-gray-700">{modalMessage}</p>
+
 
         {(excelProcessor.successList.length > 0 || excelProcessor.failedList.length > 0) && (
           <div className="mt-4">
@@ -225,6 +254,7 @@ const RegisterArea = () => {
         )}
       </Modal>
 
+
       {/* Loading Modal */}
       <Modal
         isOpen={isLoading}
@@ -234,13 +264,20 @@ const RegisterArea = () => {
         primaryButtonText={null}
         showCloseButton={false}
       >
+
         <div className="flex items-center justify-center p-4">
           <CircularProgress size={24} className="mr-3" />
           <p>{loadingMessage}</p>
         </div>
       </Modal>
     </FormContainer>
+
   )
 }
 
+
 export default RegisterArea;
+
+
+ 
+
