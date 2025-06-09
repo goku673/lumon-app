@@ -14,9 +14,11 @@ import UserProfileMobile from "./userProfileMovil";
 import UserLoadingSkeleton from "@/common/userLoading";
 
 const TopMenu = () => {
+  // Hooks
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [token, setToken] = useState(null);
 
+  // useEffect
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedToken = localStorage.getItem('token');
@@ -24,18 +26,22 @@ const TopMenu = () => {
     }
   }, []);
 
+  // useQuery
   const { data: user, isLoading: isLoadingUser } = useGetUserQuery(token, {
     skip: !token,
   });
 
+  // useMemo
   const filteredLinks = useMemo(() => {
     if (!user) return [];
     if (user.is_admin) return navLinks;
     return navLinks.filter(link => !link.adminOnly);
   }, [user]);
 
+  // Funciones
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  // Funciones
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("token")
@@ -103,7 +109,6 @@ const TopMenu = () => {
           </div>
         </div>
       </div>
-
       <div className="lg:hidden perspective-[1200px] origin-top w-full overflow-hidden">
         <DropDownMenuMovil
           isMenuOpen={isMenuOpen}
