@@ -1,24 +1,42 @@
 "use client";
-import { useState } from "react";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import Button from "@/common/button";
-import Input from "@/common/input";
-import Select from "@/common/select";
-import FormGroup from "@/components/formGroup";
-import FileUploader from "@/components/fileUploader";
-import FormContainer from "@/common/formContainer";
-import FormContent from "@/common/formContent";
-import Title from "@/common/title";
-import Text from "@/common/text";
+
+import { useState } from "react"; // Hook para manejar el estado local
+
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";// Icono para el botón
+
+import Button from "@/common/button";// Botón personalizado
+
+import Input from "@/common/input";// Input personalizado
+
+import Select from "@/common/select";// Select personalizado
+
+import FormGroup from "@/components/formGroup";// Agrupador de campos del formulario
+
+import FileUploader from "@/components/fileUploader";// Componente para subir archivos
+
+import FormContainer from "@/common/formContainer"; // Contenedor del formulario
+
+import FormContent from "@/common/formContent";// Contenido del formulario
+
+import Title from "@/common/title";// Título del formulario
+
+import Text from "@/common/text"; // Texto auxiliar
+
 import { useGetGuardiansQuery } from "@/app/redux/services/guardiansApi";
 import { completeGuardianFields, renderField } from "@/utils/inputFieldsGuardians";
 import Selector from "./selector";
 import Modal from "./modal/modal";
 
+
+// Componente principal para registrar un tutor
 const GuardianRegister = ({ onSubmit, initialData }) => {
+    // Obtener tutores existentes desde el store
   const { data: guardians = [] } = useGetGuardiansQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+
+  
+  // Estado del formulario con datos iniciales
   const [formData, setFormData] = useState({
     apellidoPaterno: "",
     apellidoMaterno: "",
@@ -32,15 +50,21 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     ...initialData,
   });
 
+  // Manejo del cambio en los inputs
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
+    
+    // Si es un archivo, se guarda como File
     if (name === "comprobantePago" && files && files.length > 0) {
       setFormData((prev) => ({
         ...prev,
         [name]: files[0],
       }));
     } else {
+
+      // Si no, simplemente se guarda el valor
       setFormData((prev) => ({
         ...prev,
         [name]: value,
@@ -48,12 +72,15 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     }
   };
 
+
+  // Selección de tutor existente
   const handleGuardianSelect = (guardian) => {
     setFormData((prev) => ({
       ...prev,
       selectedGuardians: [...prev.selectedGuardians, guardian],
     }));
   };
+
 
   const handleGuardianRemove = (guardian) => {
     setFormData((prev) => ({
@@ -64,6 +91,9 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     }));
   };
 
+
+
+  // Validación del formulario
   const isFormValid = () => {
     const {
       apellidoPaterno,
@@ -77,10 +107,15 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
       selectedGuardians,
     } = formData;
     
+
+       // Si hay tutores seleccionados, es válido
     if (selectedGuardians.length > 0) {
       return true;
     }
+
     
+    // Validación manual si no se seleccionaron tutores 
+
     const manualFilled =
       apellidoPaterno &&
       apellidoMaterno &&
@@ -91,8 +126,10 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
       comprobantePago &&
       tipo;
       
+
     return manualFilled;
   };
+
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -102,6 +139,7 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     }
     onSubmit(formData);
   };
+
 
   const renderComponent = (fieldConfig) => {
     const { component, props } = renderField(
@@ -114,6 +152,8 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
       }
     );
     
+
+
     switch (component) {
       case "Selector":
         return <Selector {...props} items={guardians} />;
@@ -137,6 +177,8 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     }
   };
 
+
+
   return (
     <> 
     <FormContainer>
@@ -145,6 +187,7 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
         className="text-xl md:text-2xl font-medium mb-6"
       />
       
+
       {formData.selectedGuardians.length > 0 ? (
         <div className="mb-4">
           <Text
@@ -159,6 +202,8 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
         />
       )}
       
+
+
       <FormContent onSubmit={handleSubmit}>
         {completeGuardianFields.map((group, index) => (
           <FormGroup key={index} label={group.groupLabel}>
@@ -172,6 +217,7 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
           </FormGroup>
         ))}
         
+
         <Button
           type="submit"
           className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-md flex items-center justify-center"
@@ -196,4 +242,21 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
   );
 };
 
+
+
+
 export default GuardianRegister;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
