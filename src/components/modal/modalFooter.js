@@ -3,26 +3,17 @@
 // La estructura modular facilita el mantenimiento y mejora la legibilidad del código.
 
 // Los componentes de tarjeta incluyen:
-
 // - Card: Contenedor principal de la tarjeta con estilos generales.
-
 // - CardHeader: Encabezado de la tarjeta, con disposición en columna.
 // - CardTitle: Título estilizado dentro de la tarjeta.
-
 // - CardDescription: Texto de descripción con formato ligero.
-
 // - CardContent: Área de contenido de la tarjeta con espaciado adecuado.
-
 // - CardFooter: Pie de tarjeta con alineación de elementos.
 
 // Los componentes de modal incluyen:
-
 // - ModalContainer: Contenedor principal del modal con bordes redondeados y sombra.
-
 // - ModalHeader: Encabezado del modal con título y función de cierre.
-
 // - ModalContent: Área central del modal con espaciado uniforme.
-
 // - ModalFooter: Pie de modal con botones de acción primaria y secundaria.
 
 "use client"
