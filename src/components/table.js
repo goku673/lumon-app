@@ -1,4 +1,5 @@
 "use client"
+
 import {
   useReactTable,
   getCoreRowModel,
@@ -6,24 +7,35 @@ import {
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
+// Importa funciones esenciales de la librería react-table
 
-
+// Componente funcional que recibe datos y columnas como props
 const Table = ({
   data,
   columns,
 
 }) => {
+
+  // Inicializa la tabla con configuración básica: columnas, datos y modelos de filas
   const table = useReactTable({
     columns,
+    // Definición de columnas
     data,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    // Datos de entrada
+    getCoreRowModel: getCoreRowModel(), 
+    // Modelo base de filas
+    getSortedRowModel: getSortedRowModel(), 
+    // Habilita ordenamiento
     getPaginationRowModel: getPaginationRowModel(),
+    // Habilita paginación
   });
+
 
   return (
     <div className="overflow-x-auto rounded-lg overflow-y-auto">
+
       <table className="w-full border-collapse">
+
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} className="bg-[#4F81BD] text-white">
@@ -39,8 +51,12 @@ const Table = ({
               ))}
             </tr>
           ))}
+
           <tr className="border-b border-gray-200"/>
+
         </thead>
+
+
         <tbody>
           {table.getRowModel().rows.map((row, index) => (
             <tr
@@ -62,6 +78,12 @@ const Table = ({
 
     </div>
   );
+
 };
 
+// Exporta el componente para su uso en otras partes de la aplicación
 export default Table;
+
+
+
+
