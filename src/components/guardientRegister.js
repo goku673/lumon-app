@@ -16,9 +16,11 @@ import Selector from "./selector";
 import Modal from "./modal/modal";
 
 const GuardianRegister = ({ onSubmit, initialData }) => {
+  // Obtener tutores existentes desde el backend
   const { data: guardians = [] } = useGetGuardiansQuery();
+   // Estado para mostrar el modal de advertencia si el formulario está incompleto
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  // Estado del formulario con valores iniciales (si se proporcionan)
   const [formData, setFormData] = useState({
     apellidoPaterno: "",
     apellidoMaterno: "",
@@ -31,10 +33,10 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     selectedGuardians: [],
     ...initialData,
   });
-
+  // Manejar cambios en los inputs del formulario
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-
+   // Si es un archivo, guardar solo el primer archivo
     if (name === "comprobantePago" && files && files.length > 0) {
       setFormData((prev) => ({
         ...prev,
@@ -47,14 +49,14 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
       }));
     }
   };
-
+// Agregar un tutor existente a la lista seleccionada
   const handleGuardianSelect = (guardian) => {
     setFormData((prev) => ({
       ...prev,
       selectedGuardians: [...prev.selectedGuardians, guardian],
     }));
   };
-
+  // Remover un tutor previamente seleccionado
   const handleGuardianRemove = (guardian) => {
     setFormData((prev) => ({
       ...prev,
@@ -63,7 +65,7 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
       ),
     }));
   };
-
+  // Validar si el formulario tiene los datos necesarios para continuar
   const isFormValid = () => {
     const {
       apellidoPaterno,
@@ -76,11 +78,11 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
       tipo,
       selectedGuardians,
     } = formData;
-    
+        // Si se seleccionaron tutores existentes, es válido
     if (selectedGuardians.length > 0) {
       return true;
     }
-    
+    // Validar si los campos obligatorios están completos
     const manualFilled =
       apellidoPaterno &&
       apellidoMaterno &&
@@ -93,7 +95,7 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
       
     return manualFilled;
   };
-
+// Manejar envío del formulario
   const handleSubmit = e => {
     e.preventDefault();
     if (!isFormValid()) {
@@ -102,7 +104,7 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
     }
     onSubmit(formData);
   };
-
+// Renderizar componentes dinámicamente según configuración de campos
   const renderComponent = (fieldConfig) => {
     const { component, props } = renderField(
       fieldConfig, 
@@ -113,7 +115,7 @@ const GuardianRegister = ({ onSubmit, initialData }) => {
         handleGuardianRemove 
       }
     );
-    
+    // Renderizar el componente correspondiente
     switch (component) {
       case "Selector":
         return <Selector {...props} items={guardians} />;
