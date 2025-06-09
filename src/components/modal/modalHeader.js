@@ -1,3 +1,23 @@
+// Conjunto de componentes reutilizables para tarjetas y modales.
+// Estos componentes están diseñados para ser flexibles y modulares, 
+// facilitando la personalización y mantenimiento del código.
+
+// - Componentes de tarjeta:
+//   * Card: Contenedor principal con estilos predefinidos.
+//   * CardHeader: Encabezado con disposición en columna.
+//   * CardTitle: Título de la tarjeta con formato llamativo.
+//   * CardDescription: Texto descriptivo con estilo ligero.
+//   * CardContent: Área de contenido con espaciado adecuado.
+//   * CardFooter: Pie de tarjeta con alineación de elementos.
+
+// - Componentes de modal:
+//   * ModalContainer: Contenedor principal con bordes redondeados y sombra.
+//   * ModalHeader: Encabezado con título, ícono y función de cierre.
+//   * ModalContent: Área de contenido con relleno uniforme.
+//   * ModalFooter: Pie de modal con botones de acción primaria y secundaria.
+
+
+// y estilos responsivos en la aplicación.
 "use client"
 
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark"
