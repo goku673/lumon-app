@@ -60,6 +60,7 @@ export default function OlympicsList() {
       day: "numeric",
     });
 
+    
   if (error) {
     return (
       <div className="rounded-lg bg-red-50 p-6 text-center">
@@ -78,6 +79,8 @@ export default function OlympicsList() {
    * @param {Array} list - Lista de olimpiadas a mostrar
    * @returns {JSX.Element} Componente de cuadrícula con las tarjetas de olimpiadas
    */
+
+
   const renderGrid = (list) => {
     if (isLoading) {
       return (
@@ -101,6 +104,7 @@ export default function OlympicsList() {
       );
     }
 
+
     if (!list.length) {
       return (
         <div className="text-center py-16">
@@ -112,6 +116,7 @@ export default function OlympicsList() {
         </div>
       );
     }
+
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -168,7 +173,7 @@ export default function OlympicsList() {
                     setSelected(o);
                   }
                 }}
-              >
+              > 
                 {selected?.id === o.id ? "Seleccionada" : "Seleccionar"}
               </ButtonSE>
             </CardFooter>
@@ -180,15 +185,21 @@ export default function OlympicsList() {
 
   return (
     <div className="py-8 px-4 space-y-8">
-      {/* Título de la sección */}
+      {/* Contenedor principal con padding vertical y horizontal */}
+
+      {/* Título de la sección centrado */}
       <div className="flex justify-center">
         <Title className="text-white" title="Lista de Olimpiadas" />
       </div>
 
-      {/* Pestañas de filtrado */}
+      {/* Componente de pestañas para filtrar las olimpiadas */}
       <Tabs defaultValue="all" className="w-auto mx-auto justify-center">
+
+        {/* Contenedor de los botones de pestañas (filtro) */}
         <div className="flex justify-center mb-4">
           <TabsList className="mb-6 bg-gray-100 p-1 rounded-lg">
+
+              {/* Iteración sobre las opciones de filtro: todas, activas, inactivas */}
             {["all", "active", "inactive"].map(
               (
                 tab // Opciones de filtrado
@@ -208,14 +219,30 @@ export default function OlympicsList() {
             )}
           </TabsList>
         </div>
+
+          {/* Contenido mostrado para la pestaña "Todas" */}
         <TabsContent value="all">{renderGrid(olympics)}</TabsContent>
+
+        {/* Contenido mostrado para la pestaña "Activas" */}
         <TabsContent value="active">
           {renderGrid(olympics.filter((o) => o.status === "active"))}
         </TabsContent>
+
+         {/* Contenido mostrado para la pestaña "Inactivas" */}
         <TabsContent value="inactive">
           {renderGrid(olympics.filter((o) => o.status === "inactive"))}
         </TabsContent>
       </Tabs>
+
     </div>
+
   );
+
 }
+
+
+
+
+
+
+
