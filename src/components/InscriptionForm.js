@@ -6,30 +6,31 @@ import GuardianRegister from "@/components/guardientRegister";
 import CompetitorRegister from "@/components/competitorRegister";
 import Modal from "@/components/modal/modal";
 import CircularProgress from '@mui/material/CircularProgress';
-
+// Componente principal del formulario de inscripción
 export default function InscriptionForm({
-  selectedOlympic,
-  step,
-  animationDirection,
-  guardiansData,
-  guardianDataReverse,
-  competitorData,
-  loadingModal,
-  modal,
-  templateHeaders,
-  templateExample,
-  excelProcessor,
-  handleProcessRecords,
-  handleExportResults,
-  handleGuardianSubmit,
-  handleCompetitorSubmit,
-  handleBack,
-  closeModal,
-  setStep,
-  setAnimationDirection,
+  selectedOlympic,              // Objeto con la olimpiada seleccionada
+  step,                         // Paso actual del formulario (1 o 2)
+  animationDirection,           // Dirección de la animación (forward o backward)
+  guardiansData,                // Lista de apoderados registrados
+  guardianDataReverse,          // Datos iniciales para el formulario de apoderado
+  competitorData,               // Datos iniciales para el formulario de competidor
+  loadingModal,                 // Estado del modal de carga
+  modal,                        // Estado del modal de resultado
+  templateHeaders,              // Encabezados del template Excel
+  templateExample,              // Ejemplo de datos para la carga masiva
+  excelProcessor,               // Función para procesar datos del Excel
+  handleProcessRecords,         // Función para procesar registros del Excel
+  handleExportResults,          // Función para exportar resultados
+  handleGuardianSubmit,         // Función para guardar datos del apoderado
+  handleCompetitorSubmit,       // Función para guardar datos del competidor
+  handleBack,                   // Función para regresar al paso anterior
+  closeModal,                   // Función para cerrar modal 
+  setStep,                      // Función para cambiar de paso    
+  setAnimationDirection,        // Función para cambiar dirección de animación
 }) {
   return (
     <>
+      {/* Lista de olimpiadas disponibles */}
       <OlympicsList />
       <div className="min-h-screen max-w-[1400px] mx-auto lg:px-16">
         <Title
