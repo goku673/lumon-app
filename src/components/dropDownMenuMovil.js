@@ -1,6 +1,14 @@
 import React from "react";
-
+// Componente DropDownMenuMovil
+// Este componente representa un menú desplegable móvil, que acepta contenido como hijos (children),
+// un estado de visibilidad del menú (isMenuOpen) y clases CSS personalizadas (className).
+// Componente de menú desplegable para móviles
+// Props:
+// - children: contenido interno que se renderiza dentro del menú
+// - isMenuOpen: indica si el menú está abierto (booleano)
+// - className: clases CSS adicionales para estilizar el contenedor
 const DropDownMenuMovil = ({ children, isMenuOpen, className }) => {
+  // Contenedor principal con fondo blanco y clases personalizadas
   return (
     <div className={`bg-white ${className}`}>
       <div className="space-y-1 p-4">
