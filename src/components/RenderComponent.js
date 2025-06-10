@@ -24,15 +24,16 @@ const RenderComponent = ({
   dataProviders = {},
   renderField
 }) => {
- 
+ // renderField devuelve los datos necesarios para renderizar el componente adecuado
   const { component, props, wordCount, maxWords, message, items } = renderField(
     fieldConfig, 
     formData, 
     handlers, 
     dataProviders
   );
-  
+  // Renderizado condicional según el tipo de componente solicitad
   switch (component) {
+    // Campo de texto (input) con íconos opcionales
     case "Input":
       return (
         <div className="flex items-center">
@@ -41,7 +42,7 @@ const RenderComponent = ({
           <Input {...props} />
         </div>
       );
-      
+    // Área de texto (textarea) con contador de palabras y etiqueta  
     case "Textarea":
       return (
         <Textarea
@@ -53,19 +54,19 @@ const RenderComponent = ({
           {...props}
         />
       );
-      
+    // Menú desplegable  
     case "Select":
       return <Select {...props} />;
-      
+    // Selector personalizado (lista de opciones complejas, por ejemplo)  
     case "Selector":
       return <Selector {...props} />;
-      
+    // Estado de carga mientras se obtienen datos  
     case "Loading":
       return <p className="text-gray-500">{message || "Cargando..."}</p>;
-      
+    // Estado de error si hubo problemas al cargar datos  
     case "Error":
       return <p className="text-red-500">{message || "Error al cargar datos"}</p>;
-      
+    // Si el tipo no está definido, no se renderiza nada  
     default:
       return null;
   }
