@@ -3,7 +3,7 @@ import Input from "@/common/input";
 import Button from "@/common/button";
 import Text from "@/common/text";
 import CloseIcon from "@mui/icons-material/Close";
-
+// Componente Selector reutilizable con soporte para selección múltiple
 const Selector = ({
   items = [],
   selectedItems = [],
@@ -13,14 +13,14 @@ const Selector = ({
   placeholder = "Buscar...",
   labelKey = "name",
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const selectorRef = useRef(null);
-
+  const [searchTerm, setSearchTerm] = useState(""); // Estado del término de búsqueda
+  const [isOpen, setIsOpen] = useState(false);      // Controla si el menú de opciones está abierto
+  const selectorRef = useRef(null);                 // Referencia al contenedor del selector para detectar clics externos
+  // Filtra los ítems según el término de búsqueda
   const filteredItems = items.filter((item) =>
     item[labelKey].toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  // Efecto para cerrar el menú al hacer clic fuera del componente
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (selectorRef.current && !selectorRef.current.contains(event.target)) {
