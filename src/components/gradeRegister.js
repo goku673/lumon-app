@@ -21,18 +21,21 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 // Componente RegisterGrade
 const RegisterGrade = () => {
+  // Hook de RTK Query para crear un grado
   const [createGrade] = usePostIncriptionGradesMutation();
   const processingRef = useRef(false);
-
+  // Estado del formulario
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
     wordCount: 0,
   });
+  // Estados para manejar el modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalType, setModalType] = useState("success");
+  // Validación y carga
   const [isDescriptionValid, setIsDescriptionValid] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
@@ -44,8 +47,10 @@ const RegisterGrade = () => {
   // Hooks
   const excelProcessor = useExcelProcessor({
     processRecord: async (record) => {
+      // Validación de cada fila del Excel
       if (!record.name || !record.price)
         throw new Error("Datos incompletos en el registro");
+      // Creación del grado desde el Excel
       const resp = await createGrade({
         name: record.name,
         description: record.description || "",
@@ -82,7 +87,7 @@ const RegisterGrade = () => {
     },
   });
   // useEffect
-
+  // Efecto para contar palabras y validar la descripción
   useEffect(() => {
     const words = formData.description.trim()
       ? formData.description.trim().split(/\s+/)
@@ -90,13 +95,14 @@ const RegisterGrade = () => {
     setFormData((prev) => ({ ...prev, wordCount: words.length }));
     setIsDescriptionValid(words.length <= 10);
   }, [formData.description]);
-
+  // Manejar cambios de input general
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Funciones
+  // Manejar cambios en la descripción con validación de longitud
   const handleDescriptionChange = (e) => {
     const newText = e.target.value;
     const words = newText.trim() ? newText.trim().split(/\s+/) : [];
@@ -107,9 +113,10 @@ const RegisterGrade = () => {
   };
 
   // Funciones
+  // Envío del formulario manual
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    // Validaciones previas
     if (!formData.name.trim() || !formData.price) {
       setModalType("error");
       setModalMessage("Todos los campos requeridos deben ser llenados");
@@ -147,7 +154,7 @@ const RegisterGrade = () => {
       setIsModalOpen(true);
     }
   };
-
+  // Renderizar un campo según configuración
   const renderComponent = (fieldConfig) => {
     return (
       <RenderComponent
@@ -162,7 +169,7 @@ const RegisterGrade = () => {
       />
     );
   };
-
+  // Procesar registros cargados por Excel
   const handleProcessRecords = (records) => {
     // Limpiar resultados anteriores
     excelProcessor.clearResults?.() || [];
@@ -175,7 +182,7 @@ const RegisterGrade = () => {
     // Iniciar el procesamiento
     excelProcessor.processRecords(records);
   };
-
+  // Cierra modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
 
