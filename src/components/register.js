@@ -1,4 +1,5 @@
-"use client";
+"use client"; // Indica que este componente se renderiza del lado del cliente
+// Importaciones necesarias de React, Next.js y componentes personalizados
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/common/button";
@@ -15,24 +16,25 @@ import { setUser } from "@/app/redux/slice/userSlice";
 import Modal from "./modal/modal";
 
 
-
+// Componente principal de registro de usuarios
 const RegisterPage = () => {
-  const router = useRouter();
-  const [openModal, setOpenModal] = useState(false);
-  const dispatch = useDispatch();
-  const [register] = useRegisterMutation();
+  const router = useRouter();// Hook para redireccionamiento
+  const [openModal, setOpenModal] = useState(false);// Estado para controlar el modal de éxito
+  const dispatch = useDispatch();// Hook para acciones Redux
+  const [register] = useRegisterMutation();// Hook para llamar a la mutación de registro
+  // Estado local para los datos del formulario
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     password_confirmation: "",
-    is_admin: false,
+    is_admin: false, // Campo adicional para indicar si es administrador
   });
-  const [error, setError] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const [error, setError] = useState(""); // Estado para mostrar errores
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // No se usa, puede eliminarse
+  const [showPassword, setShowPassword] = useState(false); // Mostrar/ocultar contraseña
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Mostrar/ocultar confirmación
+  // Maneja cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -40,36 +42,37 @@ const RegisterPage = () => {
       [name]: value
     });
   };
-
+  // Alterna visibilidad del campo de contraseña
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
+  // Alterna visibilidad del campo de confirmación de contraseña
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
-
+  // Maneja el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+    // Validación básica de campos vacíos
     if (!formData.name || !formData.email || !formData.password || !formData.password_confirmation) {
       setError("Por favor complete todos los campos");
       return;
     }
-    
+    // Verifica si las contraseñas coinciden
     if (formData.password !== formData.password_confirmation) {
       setError("Las contraseñas no coinciden");
       return;
     }
     
     try {
-      
+     // Intenta registrar al usuario 
      const response = await register(formData).unwrap();
      setOpenModal(true);
       
       
     } catch (err) {
+      // Captura errores de la API
       setError("Error al registrar usuario. Inténtelo de nuevo.");
     }
   };
