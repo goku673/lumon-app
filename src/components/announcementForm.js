@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Indica que este componente se ejecuta del lado del cliente
 import { useState, useRef } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/cards";
 import Input from "@/common/input";
@@ -8,7 +8,7 @@ import Button from "@/common/button";
 import FormContainer from "@/common/formContainer";
 import FormContent from "@/common/formContent";
 import Modal from "@/components/modal/modal";
-
+// Componente del formulario para crear o editar un anuncio
 const AnnouncementForm = ({
   onSubmit,
   isLoading,
@@ -40,15 +40,15 @@ const AnnouncementForm = ({
   //Definir referencias
   const image1Ref = useRef(null);
   const image2Ref = useRef(null);
-
+  // Manejadores de cambio de campos
   const handleTitleChange = (e) => setTitle(e.target.value);
 
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
-    const words = e.target.value.trim().split(/\s+/);
+    const words = e.target.value.trim().split(/\s+/); // Contar palabras
     setWordCount(e.target.value.trim() === "" ? 0 : words.length);
   };
-
+  // Manejador de imagen principal
   const handleImage1Change = (e) => {
     const file = e.target.files[0];
     if (file) {
